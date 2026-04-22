@@ -1,11 +1,12 @@
 import { Link, NavLink } from "react-router-dom";
-import { Calendar, Sparkles, BookOpen, Settings as SettingsIcon, Wrench, ListChecks, Flag, Globe, Moon } from "lucide-react";
+import { Calendar, Sparkles, BookOpen, Settings as SettingsIcon, Wrench, ListChecks, Flag, Globe, Moon, Vote } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { to: "/", label: "মূল পাতা", icon: Calendar },
   { to: "/panjika", label: "পঞ্জিকা", icon: Moon },
   { to: "/festivals", label: "উৎসব", icon: Sparkles },
+  { to: "/election-day", label: "নির্বাচনী দিন", icon: Vote },
   { to: "/freedom-fighters", label: "স্বাধীনতা সংগ্রামী", icon: Flag },
   { to: "/holidays", label: "বিশ্বের ছুটি", icon: Globe },
   { to: "/events", label: "ইভেন্ট", icon: ListChecks },
@@ -38,7 +39,7 @@ export function NavBar() {
               end={it.to === "/"}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  "flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap",
                   isActive
                     ? "bg-primary/10 text-primary"
                     : "text-foreground/75 hover:bg-secondary hover:text-foreground",
@@ -60,7 +61,7 @@ export function NavBar() {
               end={it.to === "/"}
               className={({ isActive }) =>
                 cn(
-                  "flex shrink-0 items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium",
+                  "flex shrink-0 items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap",
                   isActive ? "bg-primary/10 text-primary" : "text-foreground/70",
                 )
               }

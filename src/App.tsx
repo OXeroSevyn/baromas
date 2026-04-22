@@ -15,6 +15,7 @@ import About from "./pages/About";
 import FreedomFighters from "./pages/FreedomFighters";
 import Holidays from "./pages/Holidays";
 import Panjika from "./pages/Panjika";
+import ElectionDay from "./pages/ElectionDay";
 import NotFound from "./pages/NotFound";
 import { LoadingScreen } from "./components/calendar/LoadingScreen";
 import { useState } from "react";
@@ -44,6 +45,7 @@ const App = () => {
           <Route path="/freedom-fighters" element={<FreedomFighters />} />
           <Route path="/holidays" element={<Holidays />} />
           <Route path="/panjika" element={<Panjika />} />
+          <Route path="/election-day" element={<ElectionDay />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
