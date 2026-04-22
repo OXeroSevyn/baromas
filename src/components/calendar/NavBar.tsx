@@ -1,14 +1,18 @@
 import { Link, NavLink } from "react-router-dom";
-import { Calendar, Sparkles, BookOpen, Settings as SettingsIcon, Wrench, ListChecks, Flag, Globe, Moon, Vote, Newspaper, Sun, TrendingUp, Star } from "lucide-react";
+import { Calendar, Sparkles, BookOpen, Settings as SettingsIcon, Wrench, ListChecks, Flag, Globe, Moon, Vote, Newspaper, Sun, TrendingUp, Star, MoreHorizontal, ChevronDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-const items = [
+const mainItems = [
   { to: "/", label: "মূল পাতা", icon: Calendar },
   { to: "/panjika", label: "পঞ্জিকা", icon: Moon },
   { to: "/horoscope", label: "রাশিফল", icon: Star },
   { to: "/news", label: "সংবাদ", icon: Newspaper },
   { to: "/weather", label: "আবহাওয়া", icon: Sun },
   { to: "/market", label: "বাজার দর", icon: TrendingUp },
+];
+
+const secondaryItems = [
   { to: "/festivals", label: "উৎসব", icon: Sparkles },
   { to: "/election-day", label: "নির্বাচনী দিন", icon: Vote },
   { to: "/freedom-fighters", label: "স্বাধীনতা সংগ্রামী", icon: Flag },
@@ -19,33 +23,41 @@ const items = [
   { to: "/settings", label: "সেটিংস", icon: SettingsIcon },
 ];
 
+const allItems = [...mainItems, ...secondaryItems];
+
 export function NavBar() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md no-print">
-      <div className="container flex h-20 items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-1.5">
-          <div className="flex h-16 w-auto items-center justify-center">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md no-print shadow-sm">
+      <div className="container flex h-20 items-center justify-between gap-4 px-4">
+        <Link to="/" className="flex items-center gap-3 shrink-0 group">
+          <div className="flex h-14 w-14 items-center justify-center bg-white rounded-full shadow-inner p-1 overflow-hidden border border-orange-100 group-hover:scale-105 transition-transform duration-300">
             <img 
               src="/branding/logo-color.png" 
               alt="বারোমাস" 
-              className="h-full w-auto object-contain"
+              className="h-full w-full object-contain"
+              onError={(e) => {
+                // Fallback if logo fails
+                e.currentTarget.src = "/branding/logo-bright.png";
+              }}
             />
           </div>
-          <div className="leading-tight">
-            <div className="text-[11px] text-muted-foreground">তিথি · নক্ষত্র · উৎসব</div>
+          <div className="hidden sm:flex flex-col">
+            <span className="text-xl font-display font-bold text-accent tracking-tight leading-none group-hover:text-primary transition-colors">বারোমাস</span>
+            <span className="text-[10px] text-primary/70 font-bold uppercase tracking-widest mt-1">তিথি · নক্ষত্র · উৎসব</span>
           </div>
         </Link>
-        <nav className="hidden items-center gap-1 md:flex">
-          {items.map((it) => (
+        
+        <nav className="hidden items-center gap-1 lg:flex">
+          {mainItems.map((it) => (
             <NavLink
               key={it.to}
               to={it.to}
               end={it.to === "/"}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap",
+                  "flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold transition-all whitespace-nowrap",
                   isActive
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-primary text-white shadow-md shadow-primary/20"
                     : "text-foreground/75 hover:bg-secondary hover:text-foreground",
                 )
               }
@@ -54,19 +66,45 @@ export function NavBar() {
               {it.label}
             </NavLink>
           ))}
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold text-foreground/75 hover:bg-secondary hover:text-foreground transition-all outline-none">
+              <MoreHorizontal className="h-4 w-4" />
+              আরো <ChevronDown className="h-3 w-3" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-orange-100 animate-in fade-in zoom-in duration-200">
+              {secondaryItems.map((it) => (
+                <DropdownMenuItem key={it.to} asChild className="rounded-xl focus:bg-primary/10 focus:text-primary cursor-pointer p-0">
+                  <Link to={it.to} className="flex items-center gap-3 w-full px-4 py-3 text-sm font-bold">
+                    <it.icon className="h-4 w-4" />
+                    {it.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
+
+        {/* Mobile/Compact Tablet Trigger */}
+        <div className="lg:hidden flex items-center gap-2">
+           {/* We keep the horizontal scroll for mobile as requested before but cleaned up */}
+        </div>
       </div>
-      <div className="md:hidden border-t border-border">
-        <nav className="container flex items-center gap-1 overflow-x-auto py-2">
-          {items.map((it) => (
+      
+      {/* Horizontal Scroll for all other screens */}
+      <div className="lg:hidden border-t border-border bg-secondary/30">
+        <nav className="container flex items-center gap-1 overflow-x-auto py-3 px-4 no-scrollbar">
+          {allItems.map((it) => (
             <NavLink
               key={it.to}
               to={it.to}
               end={it.to === "/"}
               className={({ isActive }) =>
                 cn(
-                  "flex shrink-0 items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap",
-                  isActive ? "bg-primary/10 text-primary" : "text-foreground/70",
+                  "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all whitespace-nowrap",
+                  isActive 
+                    ? "bg-primary text-white shadow-md" 
+                    : "bg-white/50 text-foreground/70 border border-transparent",
                 )
               }
             >
