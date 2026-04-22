@@ -32,14 +32,39 @@ const News = () => {
       const cat = categories.find(c => c.id === catId);
       const query = encodeURIComponent(cat?.query || "West Bengal News Today");
       const timestamp = new Date().getTime();
-      // Fetching more to ensure we have a solid top 20
       const targetUrl = `https://news.google.com/rss/search?q=${query}&hl=bn&gl=IN&ceid=IN:bn&t=${timestamp}`;
-      const url = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
       
-      const response = await fetch(url);
-      const data = await response.json();
+      // Using 'raw' instead of 'get' for more reliability
+      const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+      
+      let xmlText = "";
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          xmlText = await response.text();
+        }
+      } catch (e) {
+        console.warn("Primary proxy failed, trying fallback...");
+      }
+
+      // Fallback proxy if first one fails
+      if (!xmlText) {
+        const fallbackUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+        const fallbackRes = await fetch(fallbackUrl);
+        if (fallbackRes.ok) {
+          xmlText = await fallbackRes.text();
+        }
+      }
+
+      if (!xmlText) throw new Error("Could not fetch news from any source");
+
       const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+      const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+      
+      // Check for parsing errors
+      const parseError = xmlDoc.getElementsByTagName("parsererror");
+      if (parseError.length > 0) throw new Error("XML Parsing failed");
+
       const items = xmlDoc.querySelectorAll("item");
       
       const fetchedNews: NewsItem[] = Array.from(items).slice(0, 20).map(item => {
@@ -60,6 +85,7 @@ const News = () => {
       setNews(fetchedNews);
     } catch (error) {
       console.error("Error fetching news:", error);
+      setNews([]);
     } finally {
       setLoading(false);
     }

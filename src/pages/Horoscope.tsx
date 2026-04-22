@@ -37,16 +37,33 @@ const Horoscope = () => {
       const query = encodeURIComponent("আজকের রাশিফল আজকের দিনটি কেমন কাটবে");
       const timestamp = new Date().getTime();
       const targetUrl = `https://news.google.com/rss/search?q=${query}&hl=bn&gl=IN&ceid=IN:bn&t=${timestamp}`;
-      const url = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
       
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Network response failed");
+      // Using 'raw' instead of 'get' for more reliability
+      const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
       
-      const data = await response.json();
-      if (!data.contents) throw new Error("No contents found");
+      let xmlText = "";
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          xmlText = await response.text();
+        }
+      } catch (e) {
+        console.warn("Primary proxy failed, trying fallback...");
+      }
+
+      // Fallback proxy if first one fails
+      if (!xmlText) {
+        const fallbackUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+        const fallbackRes = await fetch(fallbackUrl);
+        if (fallbackRes.ok) {
+          xmlText = await fallbackRes.text();
+        }
+      }
+
+      if (!xmlText) throw new Error("Could not fetch data");
 
       const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+      const xmlDoc = parser.parseFromString(xmlText, "text/xml");
       const items = xmlDoc.querySelectorAll("item");
       
       const fetchedNews: HoroscopeItem[] = Array.from(items).slice(0, 15).map(item => ({
