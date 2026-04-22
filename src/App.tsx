@@ -15,7 +15,10 @@ import About from "./pages/About";
 import FreedomFighters from "./pages/FreedomFighters";
 import Holidays from "./pages/Holidays";
 import Panjika from "./pages/Panjika";
-import ElectionDay from "./pages/ElectionDay";
+import Horoscope from "./pages/Horoscope";
+import Weather from "./pages/Weather";
+import Market from "./pages/Market";
+import News from "./pages/News";
 import NotFound from "./pages/NotFound";
 import { LoadingScreen } from "./components/calendar/LoadingScreen";
 import { useState } from "react";
@@ -46,6 +49,10 @@ const App = () => {
           <Route path="/holidays" element={<Holidays />} />
           <Route path="/panjika" element={<Panjika />} />
           <Route path="/election-day" element={<ElectionDay />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/horoscope" element={<Horoscope />} />
+          <Route path="/weather" element={<Weather />} />
+          <Route path="/market" element={<Market />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

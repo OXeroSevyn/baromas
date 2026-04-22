@@ -1,10 +1,14 @@
 import { Link, NavLink } from "react-router-dom";
-import { Calendar, Sparkles, BookOpen, Settings as SettingsIcon, Wrench, ListChecks, Flag, Globe, Moon, Vote } from "lucide-react";
+import { Calendar, Sparkles, BookOpen, Settings as SettingsIcon, Wrench, ListChecks, Flag, Globe, Moon, Vote, Newspaper, Sun, TrendingUp, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { to: "/", label: "মূল পাতা", icon: Calendar },
   { to: "/panjika", label: "পঞ্জিকা", icon: Moon },
+  { to: "/horoscope", label: "রাশিফল", icon: Star },
+  { to: "/news", label: "সংবাদ", icon: Newspaper },
+  { to: "/weather", label: "আবহাওয়া", icon: Sun },
+  { to: "/market", label: "বাজার দর", icon: TrendingUp },
   { to: "/festivals", label: "উৎসব", icon: Sparkles },
   { to: "/election-day", label: "নির্বাচনী দিন", icon: Vote },
   { to: "/freedom-fighters", label: "স্বাধীনতা সংগ্রামী", icon: Flag },

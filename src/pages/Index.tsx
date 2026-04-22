@@ -155,12 +155,15 @@ const Index = () => {
               <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-4">
                 দ্রুত অ্যাক্সেস
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                 <QuickLink to="/panjika" label="পঞ্জিকা" emoji="📅" image="/branding/icons/panjika.png" />
+                <QuickLink to="/horoscope" label="রাশিফল" emoji="🌟" />
+                <QuickLink to="/news" label="সংবাদ" emoji="📰" />
+                <QuickLink to="/weather" label="আবহাওয়া" emoji="☀️" image="/branding/icons/sun.png" />
+                <QuickLink to="/market" label="বাজার দর" emoji="📈" />
                 <QuickLink to="/festivals" label="উৎসব" emoji="✨" image="/branding/icons/festivals.png" />
-                <QuickLink to="/events" label="ইভেন্ট" emoji="📝" image="/branding/icons/events.png" />
-                <QuickLink to="/tools" label="টুলস" emoji="🛠️" image="/branding/icons/tools.png" />
                 <QuickLink to="/election-day" label="নির্বাচনী দিন" emoji="🗳️" image="/branding/icons/election.png" />
+                <QuickLink to="/tools" label="টুলস" emoji="🛠️" image="/branding/icons/tools.png" />
               </div>
             </Card>
           </div>
