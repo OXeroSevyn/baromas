@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Flutter
+ponjika_flutter/
+
+# Backups and Large Files
+main\ backup2/
+main\ site\ backup.zip
+baromas.psd
+
+# Gemini
+.gemini/

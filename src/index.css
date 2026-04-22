@@ -1,0 +1,225 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Bangla Panjika design system — warm terracotta, maroon, cream, gold.
+   All colors HSL. Tokens only — never hardcode in components. */
+
+@layer base {
+  :root {
+    /* Surfaces */
+    --background: 38 50% 96%;          /* cream */
+    --foreground: 0 35% 18%;           /* deep maroon ink */
+
+    --card: 38 60% 98%;
+    --card-foreground: 0 35% 18%;
+
+    --popover: 38 60% 98%;
+    --popover-foreground: 0 35% 18%;
+
+    /* Brand */
+    --primary: 18 78% 48%;             /* terracotta / saffron */
+    --primary-foreground: 38 60% 98%;
+    --primary-glow: 22 90% 60%;
+
+    --secondary: 38 45% 90%;           /* sand */
+    --secondary-foreground: 0 35% 22%;
+
+    --muted: 38 35% 92%;
+    --muted-foreground: 0 15% 38%;
+
+    --accent: 350 65% 38%;             /* deep maroon */
+    --accent-foreground: 38 60% 98%;
+
+    --gold: 42 80% 52%;
+    --gold-foreground: 0 40% 18%;
+
+    --festive: 350 70% 45%;
+    --festive-foreground: 38 60% 98%;
+
+    --destructive: 0 75% 45%;
+    --destructive-foreground: 38 60% 98%;
+
+    --border: 28 35% 82%;
+    --input: 28 35% 85%;
+    --ring: 18 78% 48%;
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-festive: linear-gradient(135deg, hsl(18 78% 48%), hsl(350 65% 38%));
+    --gradient-sunrise: linear-gradient(180deg, hsl(42 90% 70%), hsl(18 78% 55%));
+    --gradient-cream: linear-gradient(180deg, hsl(38 55% 97%), hsl(38 40% 92%));
+
+    /* Shadows */
+    --shadow-warm: 0 10px 30px -12px hsl(18 78% 35% / 0.35);
+    --shadow-soft: 0 4px 14px -6px hsl(0 35% 20% / 0.18);
+    --shadow-gold: 0 0 0 1px hsl(42 80% 52% / 0.4), 0 6px 20px -8px hsl(42 80% 45% / 0.4);
+
+    /* Sidebar (unused but kept) */
+    --sidebar-background: 38 50% 96%;
+    --sidebar-foreground: 0 35% 18%;
+    --sidebar-primary: 18 78% 48%;
+    --sidebar-primary-foreground: 38 60% 98%;
+    --sidebar-accent: 38 45% 90%;
+    --sidebar-accent-foreground: 0 35% 22%;
+    --sidebar-border: 28 35% 82%;
+    --sidebar-ring: 18 78% 48%;
+  }
+
+  .dark {
+    --background: 0 25% 8%;
+    --foreground: 38 55% 92%;
+
+    --card: 0 25% 11%;
+    --card-foreground: 38 55% 92%;
+
+    --popover: 0 25% 11%;
+    --popover-foreground: 38 55% 92%;
+
+    --primary: 22 85% 58%;
+    --primary-foreground: 0 30% 10%;
+    --primary-glow: 30 90% 65%;
+
+    --secondary: 0 20% 16%;
+    --secondary-foreground: 38 55% 92%;
+
+    --muted: 0 18% 14%;
+    --muted-foreground: 38 25% 70%;
+
+    --accent: 350 70% 55%;
+    --accent-foreground: 38 60% 98%;
+
+    --gold: 42 85% 60%;
+    --gold-foreground: 0 30% 10%;
+
+    --festive: 350 70% 55%;
+    --festive-foreground: 38 60% 98%;
+
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 38 60% 98%;
+
+    --border: 0 20% 20%;
+    --input: 0 20% 20%;
+    --ring: 22 85% 58%;
+
+    --gradient-festive: linear-gradient(135deg, hsl(22 85% 50%), hsl(350 70% 45%));
+    --gradient-sunrise: linear-gradient(180deg, hsl(42 80% 55%), hsl(18 78% 45%));
+    --gradient-cream: linear-gradient(180deg, hsl(0 25% 10%), hsl(0 25% 7%));
+
+    --shadow-warm: 0 10px 30px -12px hsl(0 0% 0% / 0.6);
+    --shadow-soft: 0 4px 14px -6px hsl(0 0% 0% / 0.5);
+    --shadow-gold: 0 0 0 1px hsl(42 85% 60% / 0.4), 0 6px 20px -8px hsl(42 85% 50% / 0.5);
+
+    --sidebar-background: 0 25% 8%;
+    --sidebar-foreground: 38 55% 92%;
+    --sidebar-primary: 22 85% 58%;
+    --sidebar-primary-foreground: 0 30% 10%;
+    --sidebar-accent: 0 20% 16%;
+    --sidebar-accent-foreground: 38 55% 92%;
+    --sidebar-border: 0 20% 20%;
+    --sidebar-ring: 22 85% 58%;
+  }
+
+  /* Festive theme = saturated saffron/maroon, gold flourishes */
+  .festive {
+    --background: 38 70% 94%;
+    --foreground: 0 50% 15%;
+    --card: 38 80% 97%;
+    --card-foreground: 0 50% 15%;
+    --primary: 14 85% 50%;
+    --primary-foreground: 38 70% 98%;
+    --accent: 350 75% 38%;
+    --accent-foreground: 38 70% 98%;
+    --gold: 42 90% 50%;
+    --border: 28 50% 78%;
+    --ring: 14 85% 50%;
+    --gradient-festive: linear-gradient(135deg, hsl(14 85% 50%), hsl(350 75% 38%));
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: var(--font-main, 'Hind Siliguri'), system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "kern", "liga";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Baloo Da 2', 'Hind Siliguri', sans-serif;
+    @apply tracking-tight;
+  }
+
+  .font-decorative {
+    font-family: 'Mina', 'Hind Siliguri', serif;
+  }
+
+  /* Font-size scale (settings) */
+  html[data-fs="sm"] { font-size: 14px; }
+  html[data-fs="md"] { font-size: 16px; }
+  html[data-fs="lg"] { font-size: 18px; }
+  html[data-fs="xl"] { font-size: 20px; }
+
+  /* Font-family scale (settings) */
+  html[data-font="hind"] { --font-main: 'Hind Siliguri', sans-serif; }
+  html[data-font="noto"] { --font-main: 'Noto Sans Bengali', sans-serif; }
+  html[data-font="notoserif"] { --font-main: 'Noto Serif Bengali', serif; }
+  html[data-font="tiro"] { --font-main: 'Tiro Bangla', serif; }
+  html[data-font="mina"] { --font-main: 'Mina', sans-serif; }
+  html[data-font="anek"] { --font-main: 'Anek Bangla', sans-serif; }
+  html[data-font="atma"] { --font-main: 'Atma', cursive; }
+  html[data-font="galada"] { --font-main: 'Galada', cursive; }
+
+  html {
+    font-family: var(--font-main, 'Hind Siliguri', sans-serif);
+  }
+}
+
+@layer components {
+  .animate-fade-in-up {
+    animation: fadeInKeyUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .alpana-divider {
+    background-image: radial-gradient(circle at center, hsl(var(--gold) / 0.5) 1px, transparent 1.5px);
+    background-size: 14px 14px;
+    background-repeat: repeat-x;
+    background-position: center;
+    height: 14px;
+  }
+
+  .festive-gradient {
+    background: var(--gradient-festive);
+  }
+
+  .cream-gradient {
+    background: var(--gradient-cream);
+  }
+
+  .shadow-warm { box-shadow: var(--shadow-warm); }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-gold { box-shadow: var(--shadow-gold); }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; color: black !important; }
+}
+
+@keyframes fadeInKeyUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
