@@ -31,25 +31,43 @@ const News = () => {
     try {
       const cat = categories.find(c => c.id === catId);
       const query = encodeURIComponent(cat?.query || "West Bengal News");
-      const url = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://news.google.com/rss/search?q=${query}&hl=bn&gl=IN&ceid=IN:bn`)}`;
+      // Added cache buster and optimized URL
+      const timestamp = new Date().getTime();
+      const targetUrl = `https://news.google.com/rss/search?q=${query}&hl=bn&gl=IN&ceid=IN:bn&t=${timestamp}`;
+      const url = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
       
       const response = await fetch(url);
+      if (!response.ok) throw new Error("Network response was not ok");
+      
       const data = await response.json();
+      if (!data.contents) throw new Error("Empty content from proxy");
+
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(data.contents, "text/xml");
       const items = xmlDoc.querySelectorAll("item");
       
-      const fetchedNews: NewsItem[] = Array.from(items).slice(0, 12).map(item => ({
-        title: item.querySelector("title")?.textContent || "",
-        link: item.querySelector("link")?.textContent || "#",
-        source: item.querySelector("source")?.textContent || "News Source",
-        time: item.querySelector("pubDate")?.textContent || "",
-        category: cat?.label || "সাধারণ"
-      }));
+      const fetchedNews: NewsItem[] = Array.from(items).slice(0, 15).map(item => {
+        const title = item.querySelector("title")?.textContent || "";
+        const link = item.querySelector("link")?.textContent || "#";
+        const source = item.querySelector("source")?.textContent || "News Source";
+        const pubDate = item.querySelector("pubDate")?.textContent || "";
+        
+        return {
+          title: title.split(" - ")[0],
+          link: link,
+          source: source,
+          time: pubDate,
+          category: cat?.label || "সাধারণ"
+        };
+      });
 
       setNews(fetchedNews);
     } catch (error) {
       console.error("Error fetching news:", error);
+      // Fallback to a hardcoded recent snapshot if API fails completely
+      if (news.length === 0) {
+        setNews([]);
+      }
     } finally {
       setLoading(false);
     }

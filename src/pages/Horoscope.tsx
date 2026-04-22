@@ -34,17 +34,23 @@ const Horoscope = () => {
   const fetchHoroscope = async () => {
     setLoading(true);
     try {
-      const query = encodeURIComponent("আজকের রাশিফল");
-      const url = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://news.google.com/rss/search?q=${query}&hl=bn&gl=IN&ceid=IN:bn`)}`;
+      const query = encodeURIComponent("আজকের রাশিফল আজকের দিনটি কেমন কাটবে");
+      const timestamp = new Date().getTime();
+      const targetUrl = `https://news.google.com/rss/search?q=${query}&hl=bn&gl=IN&ceid=IN:bn&t=${timestamp}`;
+      const url = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
       
       const response = await fetch(url);
+      if (!response.ok) throw new Error("Network response failed");
+      
       const data = await response.json();
+      if (!data.contents) throw new Error("No contents found");
+
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(data.contents, "text/xml");
       const items = xmlDoc.querySelectorAll("item");
       
       const fetchedNews: HoroscopeItem[] = Array.from(items).slice(0, 15).map(item => ({
-        title: item.querySelector("title")?.textContent || "",
+        title: (item.querySelector("title")?.textContent || "").split(" - ")[0],
         link: item.querySelector("link")?.textContent || "#",
         source: item.querySelector("source")?.textContent || "Bengali News",
         pubDate: item.querySelector("pubDate")?.textContent || ""
