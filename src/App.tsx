@@ -15,6 +15,7 @@ import About from "./pages/About";
 import FreedomFighters from "./pages/FreedomFighters";
 import Holidays from "./pages/Holidays";
 import Panjika from "./pages/Panjika";
+import ElectionDay from "./pages/ElectionDay";
 import Horoscope from "./pages/Horoscope";
 import Weather from "./pages/Weather";
 import Market from "./pages/Market";
