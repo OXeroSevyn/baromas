@@ -30,26 +30,22 @@ const News = () => {
     setLoading(true);
     try {
       const cat = categories.find(c => c.id === catId);
-      const query = encodeURIComponent(cat?.query || "West Bengal News");
-      // Added cache buster and optimized URL
+      const query = encodeURIComponent(cat?.query || "West Bengal News Today");
       const timestamp = new Date().getTime();
+      // Fetching more to ensure we have a solid top 20
       const targetUrl = `https://news.google.com/rss/search?q=${query}&hl=bn&gl=IN&ceid=IN:bn&t=${timestamp}`;
       const url = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
       
       const response = await fetch(url);
-      if (!response.ok) throw new Error("Network response was not ok");
-      
       const data = await response.json();
-      if (!data.contents) throw new Error("Empty content from proxy");
-
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(data.contents, "text/xml");
       const items = xmlDoc.querySelectorAll("item");
       
-      const fetchedNews: NewsItem[] = Array.from(items).slice(0, 15).map(item => {
+      const fetchedNews: NewsItem[] = Array.from(items).slice(0, 20).map(item => {
         const title = item.querySelector("title")?.textContent || "";
         const link = item.querySelector("link")?.textContent || "#";
-        const source = item.querySelector("source")?.textContent || "News Source";
+        const source = item.querySelector("source")?.textContent || "Bengali News";
         const pubDate = item.querySelector("pubDate")?.textContent || "";
         
         return {
@@ -64,10 +60,6 @@ const News = () => {
       setNews(fetchedNews);
     } catch (error) {
       console.error("Error fetching news:", error);
-      // Fallback to a hardcoded recent snapshot if API fails completely
-      if (news.length === 0) {
-        setNews([]);
-      }
     } finally {
       setLoading(false);
     }
@@ -79,32 +71,39 @@ const News = () => {
 
   return (
     <PageShell>
-      <div className="container py-6 animate-fade-in">
-        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="font-display text-4xl font-bold text-accent">সংবাদ ফিড</h1>
-            <p className="text-muted-foreground mt-1">সর্বশেষ বাংলা খবরের রিয়েল-টাইম আপডেট</p>
+      <div className="container py-6 animate-fade-in max-w-4xl">
+        <div className="mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="bg-primary/10 p-3 rounded-2xl">
+               <Newspaper className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="font-display text-4xl font-bold text-accent">আজকের শীর্ষ ২০ সংবাদ</h1>
+              <p className="text-muted-foreground mt-1 font-medium flex items-center gap-2">
+                <Globe className="h-4 w-4" /> সর্বশেষ আপডেট: {toBanglaNum(new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }))}
+              </p>
+            </div>
           </div>
           <button 
             onClick={() => fetchNews(activeCat)}
             disabled={loading}
-            className="flex items-center gap-2 bg-card border px-4 py-2 rounded-xl shadow-soft hover:bg-secondary transition-all disabled:opacity-50"
+            className="flex items-center gap-2 bg-white border-2 border-primary/20 px-6 py-3 rounded-2xl shadow-soft hover:bg-primary/5 transition-all disabled:opacity-50 text-primary font-bold"
           >
-            <RefreshCcw className={`h-4 w-4 text-primary ${loading ? 'animate-spin' : ''}`} />
-            <span className="text-sm font-bold">রিফ্রেশ</span>
+            <RefreshCcw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            রিফ্রেশ
           </button>
         </div>
 
-        {/* Categories Tab Bar */}
-        <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar mb-6">
+        {/* Categories Tab Bar - Premium Style */}
+        <div className="flex gap-3 overflow-x-auto pb-6 no-scrollbar mb-8">
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveCat(cat.id)}
-              className={`flex shrink-0 items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+              className={`flex shrink-0 items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold transition-all border-2 ${
                 activeCat === cat.id 
-                ? "bg-primary text-white shadow-lg" 
-                : "bg-card border text-muted-foreground hover:bg-secondary"
+                ? "bg-primary border-primary text-white shadow-lg shadow-primary/30 scale-105" 
+                : "bg-white border-transparent text-muted-foreground hover:border-primary/20 hover:bg-secondary/50"
               }`}
             >
               <cat.icon className="h-4 w-4" />
@@ -114,36 +113,42 @@ const News = () => {
         </div>
 
         {loading ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-4">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <Card key={i} className="h-48 animate-pulse bg-muted" />
+              <div key={i} className="h-24 animate-pulse bg-muted rounded-3xl" />
             ))}
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-4">
             {news.map((item, i) => (
               <a 
                 key={i} 
                 href={item.link} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="group"
+                className="group block"
               >
-                <Card className="h-full p-6 shadow-soft hover:shadow-warm transition-all border-b-2 border-transparent group-hover:border-primary">
-                  <div className="flex justify-between items-start mb-4">
-                    <Badge variant="secondary" className="text-[10px] uppercase font-bold">
-                      {item.source}
-                    </Badge>
-                    <span className="text-[10px] text-muted-foreground font-medium">
-                      {toBanglaNum(new Date(item.time).toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }))}
-                    </span>
+                <Card className="p-5 shadow-soft hover:shadow-warm transition-all border-none bg-gradient-to-r from-white to-secondary/10 flex gap-5 items-center group-hover:translate-x-1 duration-300">
+                  <div className="flex-shrink-0 h-12 w-12 rounded-2xl bg-primary/5 flex items-center justify-center text-primary font-display text-xl font-bold border border-primary/10 group-hover:bg-primary group-hover:text-white transition-colors">
+                    {toBanglaNum(i + 1)}
                   </div>
-                  <h3 className="font-bold text-accent leading-relaxed group-hover:text-primary transition-colors line-clamp-3">
-                    {item.title.split(" - ")[0]}
-                  </h3>
-                  <div className="mt-6 flex items-center justify-between text-xs font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                     <span>বিস্তারিত পড়ুন</span>
-                     <ExternalLink className="h-3 w-3" />
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-1.5">
+                      <Badge variant="outline" className="text-[10px] uppercase font-bold border-primary/20 text-primary bg-primary/5">
+                        {item.source}
+                      </Badge>
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">
+                        • {toBanglaNum(new Date(item.time).toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }))}
+                      </span>
+                    </div>
+                    <h3 className="font-bold text-accent leading-snug group-hover:text-primary transition-colors text-lg line-clamp-2">
+                      {item.title}
+                    </h3>
+                  </div>
+                  
+                  <div className="shrink-0 text-primary opacity-0 group-hover:opacity-100 transition-opacity p-2 bg-primary/10 rounded-full">
+                     <ExternalLink className="h-4 w-4" />
                   </div>
                 </Card>
               </a>
@@ -152,11 +157,23 @@ const News = () => {
         )}
         
         {news.length === 0 && !loading && (
-          <div className="text-center py-20 bg-card border rounded-2xl">
-             <TrendingUp className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-             <p className="text-muted-foreground">এই ক্যাটাগরিতে কোনো খবর পাওয়া যায়নি।</p>
+          <div className="text-center py-20 bg-card border-2 border-dashed rounded-3xl">
+             <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+             <p className="text-muted-foreground font-bold">এই ক্যাটাগরিতে কোনো খবর পাওয়া যায়নি।</p>
           </div>
         )}
+
+        <div className="mt-12 p-8 bg-accent rounded-3xl text-white relative overflow-hidden">
+           <div className="absolute top-0 right-0 p-10 opacity-10">
+              <Newspaper className="h-32 w-32" />
+           </div>
+           <div className="relative z-10">
+             <h4 className="text-xl font-bold mb-2">প্রতিদিনের খবরের আপডেট</h4>
+             <p className="text-white/70 text-sm max-w-lg">
+               বারোমাস নিউজ ফিডে আমরা প্রতিদিনের সবচেয়ে গুরুত্বপূর্ণ ২০টি সংবাদ আপনার জন্য সংগ্রহ করি। সত্য ও সঠিক খবর পৌঁছে দেওয়াই আমাদের লক্ষ্য।
+             </p>
+           </div>
+        </div>
       </div>
     </PageShell>
   );
