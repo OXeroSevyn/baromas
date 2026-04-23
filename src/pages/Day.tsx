@@ -32,14 +32,17 @@ import { useSettings } from "@/hooks/use-settings";
 import { useEvents, eventsForDate, type CalendarEvent } from "@/hooks/use-events";
 import { EventDialog } from "@/components/calendar/EventDialog";
 import { toast } from "sonner";
-import { AlertTriangle, Sparkles, Star, Clock } from "lucide-react";
+import { AlertTriangle, Sparkles, Star, Clock, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toPng } from "html-to-image";
+import { useRef } from "react";
 
 const Day = () => {
   const { date } = useParams();
   const navigate = useNavigate();
   const [settings] = useSettings();
   const { events, remove } = useEvents();
+  const shareRef = useRef<HTMLDivElement>(null);
   const d = date ? parseIso(date) : new Date();
   const bn = gregorianToBangla(d, settings.region);
   const tithi = getTithi(d);
@@ -58,14 +61,75 @@ const Day = () => {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<CalendarEvent | null>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
 
-  const share = async () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      try { await navigator.share({ title: formatBanglaDate(bn), url }); } catch { /* noop */ }
-    } else {
-      await navigator.clipboard.writeText(url);
-      toast.success("লিংক কপি হয়েছে");
+  const shareImage = async () => {
+    if (!shareRef.current) return;
+    
+    setIsCapturing(true);
+    toast.loading("শেয়ার করার জন্য ইমেজ তৈরি হচ্ছে...");
+    
+    try {
+      // Small delay to ensure state update for branding footer
+      await new Promise(r => setTimeout(r, 100));
+      
+      const dataUrl = await toPng(shareRef.current, {
+        cacheBust: true,
+        backgroundColor: "#fdf8f4",
+        style: {
+          borderRadius: '0',
+          padding: '20px'
+        }
+      });
+      
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], `ponjika-${isoDate(d)}.png`, { type: 'image/png' });
+
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: `বারোমাস পঞ্জিকা - ${formatBanglaDate(bn)}`,
+        });
+        toast.dismiss();
+      } else {
+        // Fallback to download if sharing files is not supported
+        const link = document.createElement('a');
+        link.download = `ponjika-${isoDate(d)}.png`;
+        link.href = dataUrl;
+        link.click();
+        toast.dismiss();
+        toast.success("ইমেজ ডাউনলোড হয়েছে (শেয়ারিং সাপোর্ট নেই)");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.dismiss();
+      toast.error("ইমেজ তৈরি করতে সমস্যা হয়েছে");
+    } finally {
+      setIsCapturing(false);
+    }
+  };
+
+  const downloadImage = async () => {
+    if (!shareRef.current) return;
+    setIsCapturing(true);
+    toast.loading("ইমেজ ডাউনলোড হচ্ছে...");
+    try {
+      await new Promise(r => setTimeout(r, 100));
+      const dataUrl = await toPng(shareRef.current, {
+         cacheBust: true,
+         backgroundColor: "#fdf8f4",
+      });
+      const link = document.createElement('a');
+      link.download = `ponjika-${isoDate(d)}.png`;
+      link.href = dataUrl;
+      link.click();
+      toast.dismiss();
+      toast.success("ডাউনলোড সম্পন্ন হয়েছে");
+    } catch (err) {
+      toast.dismiss();
+      toast.error("ডাউনলোড করতে সমস্যা হয়েছে");
+    } finally {
+      setIsCapturing(false);
     }
   };
 
@@ -83,16 +147,20 @@ const Day = () => {
             <Button onClick={() => navigate(`/day/${isoDate(addDays(d, 1))}`)} className="h-10 w-10 p-0 rounded-xl bg-card border-none shadow-soft">
               <ChevronRight className="h-4 w-4" />
             </Button>
-            <Button onClick={share} className="h-10 px-4 rounded-xl bg-card border-none shadow-soft font-bold text-accent">
-              <Share2 className="h-4 w-4" /> শেয়ার
+            <Button onClick={downloadImage} className="h-10 px-4 rounded-xl bg-card border-none shadow-soft font-bold text-accent">
+              <Download className="h-4 w-4" /> ডাউনলোড
+            </Button>
+            <Button onClick={shareImage} className="h-10 px-4 rounded-xl bg-primary text-white border-none shadow-warm font-bold">
+              <Share2 className="h-4 w-4" /> শেয়ার ইমেজ
             </Button>
           </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Left Column: Main Stats */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="overflow-hidden border-none shadow-warm rounded-[32px] bg-white">
+        <div ref={shareRef} className="bg-[#fdf8f4] rounded-[40px]">
+          <div className="grid gap-6 lg:grid-cols-3">
+            {/* Left Column: Main Stats */}
+            <div className="lg:col-span-2 space-y-6">
+              <Card className="overflow-hidden border-none shadow-warm rounded-[32px] bg-white">
               <div className="bg-gradient-festive p-8 text-primary-foreground">
                 <div className="flex justify-between items-start">
                    <div>
@@ -240,12 +308,14 @@ const Day = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between px-2">
                 <h2 className="font-display text-xl font-bold text-accent">আমার ইভেন্ট</h2>
-                <button 
-                  onClick={() => { setEditing(null); setDialogOpen(true); }}
-                  className="p-2 bg-primary/10 text-primary rounded-xl hover:bg-primary hover:text-white transition-all"
-                >
-                  <Plus className="h-5 w-5" />
-                </button>
+                {!isCapturing && (
+                  <button 
+                    onClick={() => { setEditing(null); setDialogOpen(true); }}
+                    className="p-2 bg-primary/10 text-primary rounded-xl hover:bg-primary hover:text-white transition-all"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </button>
+                )}
               </div>
               {dayEvents.length === 0 ? (
                 <Card className="p-8 text-center text-muted-foreground bg-card/30 border-2 border-dashed rounded-[32px]">
@@ -259,10 +329,12 @@ const Day = () => {
                         <div className="font-bold text-accent">{e.title}</div>
                         <Badge variant="secondary" className="mt-1 bg-secondary text-[10px] uppercase">{categoryLabel(e.category)}</Badge>
                       </div>
-                      <div className="flex gap-1">
-                        <button onClick={() => { setEditing(e); setDialogOpen(true); }} className="p-2 hover:bg-secondary rounded-lg transition-colors"><Pencil className="h-4 w-4 text-muted-foreground" /></button>
-                        <button onClick={() => { remove(e.id); toast.success("মুছে ফেলা হয়েছে"); }} className="p-2 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="h-4 w-4 text-red-400" /></button>
-                      </div>
+                      {!isCapturing && (
+                        <div className="flex gap-1">
+                          <button onClick={() => { setEditing(e); setDialogOpen(true); }} className="p-2 hover:bg-secondary rounded-lg transition-colors"><Pencil className="h-4 w-4 text-muted-foreground" /></button>
+                          <button onClick={() => { remove(e.id); toast.success("মুছে ফেলা হয়েছে"); }} className="p-2 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="h-4 w-4 text-red-400" /></button>
+                        </div>
+                      )}
                     </Card>
                   ))}
                 </div>
@@ -288,8 +360,29 @@ const Day = () => {
               </div>
             )}
           </div>
+          </div>
         </div>
-      </section>
+
+        {/* Branding Footer for Image Capture */}
+        <div className={cn(
+          "mt-8 p-8 flex flex-col items-center justify-center gap-4 bg-white/50 backdrop-blur-sm rounded-[32px] border-2 border-dashed border-primary/20",
+          !isCapturing && "hidden"
+        )}>
+          <div className="flex items-center gap-3">
+             <div className="h-12 w-12 bg-primary rounded-2xl flex items-center justify-center text-white shadow-warm">
+                <Star className="h-7 w-7 fill-white" />
+             </div>
+             <div>
+                <div className="font-display text-2xl font-black text-primary tracking-tight">বারোমাস</div>
+                <div className="text-xs font-bold text-accent tracking-[0.2em] uppercase opacity-70">আধুনিক বাংলা পঞ্জিকা</div>
+             </div>
+          </div>
+          <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+             <Sparkles className="h-4 w-4 text-primary" /> Downloaded from baromas.app
+          </div>
+        </div>
+      </div>
+    </section>
 
       <EventDialog open={dialogOpen} onOpenChange={setDialogOpen} defaultDate={d} editing={editing} />
     </PageShell>
