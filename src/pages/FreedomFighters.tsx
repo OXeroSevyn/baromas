@@ -273,6 +273,7 @@ function FighterCard({ f }: { f: FreedomFighter }) {
                     )}
                   </div>
                 </div>
+              </div>
             </DialogContent>
           </Dialog>
         </div>
