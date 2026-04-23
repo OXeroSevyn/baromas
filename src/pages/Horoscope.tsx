@@ -34,9 +34,37 @@ const signs = [
 const CACHE_KEY = "horoscope_cache_v5_final_fix";
 
 const Horoscope = () => {
-  const [news, setNews] = useState<HoroscopeItem[]>([]);
+  const [news, setNews] = useState<HoroscopeItem[]>(() => {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      try {
+        const { data } = JSON.parse(cached);
+        return data || [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
+  
   const [loading, setLoading] = useState(!localStorage.getItem(CACHE_KEY));
-  const [lastUpdateText, setLastUpdateText] = useState("");
+  const [lastUpdateText, setLastUpdateText] = useState(() => {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      try {
+        const { timestamp } = JSON.parse(cached);
+        if (timestamp) {
+          const date = new Date(timestamp);
+          if (!isNaN(date.getTime())) {
+            return toBanglaNum(date.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }));
+          }
+        }
+      } catch (e) {
+        return "";
+      }
+    }
+    return "";
+  });
   const [selectedSign, setSelectedSign] = useState<typeof signs[0] | null>(null);
 
   const checkAndFetchHoroscope = async () => {
@@ -47,18 +75,29 @@ const Horoscope = () => {
     const sixPM = new Date(now).setHours(18, 0, 0, 0);
     
     let shouldFetch = false;
-    let initialData: HoroscopeItem[] = [];
 
     if (cachedData) {
-      const { data, timestamp } = JSON.parse(cachedData);
-      initialData = data;
-      setNews(data);
-      const lastUpdate = new Date(timestamp);
-      setLastUpdateText(toBanglaNum(lastUpdate.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' })));
-      
-      if (now.getTime() >= sixAM && lastUpdate.getTime() < sixAM) shouldFetch = true;
-      else if (now.getTime() >= sixPM && lastUpdate.getTime() < sixPM) shouldFetch = true;
-      else if (now.getDate() !== lastUpdate.getDate() && now.getTime() >= sixAM) shouldFetch = true;
+      try {
+        const { data, timestamp } = JSON.parse(cachedData);
+        if (timestamp) {
+          const lastUpdate = new Date(timestamp);
+          if (!isNaN(lastUpdate.getTime())) {
+            if (!lastUpdateText) {
+              setLastUpdateText(toBanglaNum(lastUpdate.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' })));
+            }
+            
+            if (now.getTime() >= sixAM && lastUpdate.getTime() < sixAM) shouldFetch = true;
+            else if (now.getTime() >= sixPM && lastUpdate.getTime() < sixPM) shouldFetch = true;
+            else if (now.getDate() !== lastUpdate.getDate() && now.getTime() >= sixAM) shouldFetch = true;
+          } else {
+            shouldFetch = true;
+          }
+        } else {
+          shouldFetch = true;
+        }
+      } catch (e) {
+        shouldFetch = true;
+      }
       
       if (!shouldFetch) {
         setLoading(false);
@@ -69,7 +108,7 @@ const Horoscope = () => {
     }
 
     if (shouldFetch) {
-      setLoading(true);
+      if (news.length === 0) setLoading(true);
       const allResults: HoroscopeItem[] = [];
       
       try {
@@ -77,32 +116,36 @@ const Horoscope = () => {
         const query = "আজকের রাশিফল";
         const ndUrl = `https://newsdata.io/api/1/news?apikey=${apiKey}&q=${encodeURIComponent(query)}&language=bn&country=in`;
         
-        try {
-          const res = await fetch(ndUrl);
-          const resData = await res.json();
-          if (resData.status === "success" && resData.results) {
-             resData.results.forEach((item: any) => {
-                allResults.push({
-                   title: item.title,
-                   link: item.link,
-                   source: item.source_id,
-                   pubDate: item.pubDate
-                });
-             });
-          }
-        } catch(e) {}
+        // Fetch NewsData and RSS in parallel
+        const [ndResponse, rssFeeds] = await Promise.allSettled([
+          fetch(ndUrl).then(res => res.json()),
+          import("@/lib/rss-fetcher").then(m => m.fetchBengaliNewsRSS("top"))
+        ]);
 
-        const { fetchBengaliNewsRSS } = await import("@/lib/rss-fetcher");
-        const rssFeeds = await fetchBengaliNewsRSS("top");
-        const filteredRss = rssFeeds
-          .filter(item => item.title.includes("রাশিফল") || item.title.includes("রাশি"))
-          .map(item => ({
-             title: item.title,
-             link: item.link,
-             source: item.source,
-             pubDate: item.time
-          }));
-        allResults.push(...filteredRss);
+        // Process NewsData results
+        if (ndResponse.status === "fulfilled" && ndResponse.value.status === "success" && ndResponse.value.results) {
+          ndResponse.value.results.forEach((item: any) => {
+            allResults.push({
+              title: item.title,
+              link: item.link,
+              source: item.source_id,
+              pubDate: item.pubDate
+            });
+          });
+        }
+
+        // Process RSS results
+        if (rssFeeds.status === "fulfilled") {
+          const filteredRss = rssFeeds.value
+            .filter(item => item.title.includes("রাশিফল") || item.title.includes("রাশি"))
+            .map(item => ({
+              title: item.title,
+              link: item.link,
+              source: item.source,
+              pubDate: item.time
+            }));
+          allResults.push(...filteredRss);
+        }
 
         const uniqueResults = Array.from(new Map(allResults.map(item => [item.title, item])).values());
         
@@ -113,7 +156,7 @@ const Horoscope = () => {
              timestamp: Date.now()
            }));
            setLastUpdateText(toBanglaNum(new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' })));
-        } else if (initialData.length === 0) {
+        } else if (news.length === 0) {
            const { mockHoroscope } = await import("@/data/mock-news");
            setNews(mockHoroscope);
         }
