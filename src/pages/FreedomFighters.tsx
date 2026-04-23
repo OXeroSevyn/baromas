@@ -211,80 +211,97 @@ function FighterCard({ f }: { f: FreedomFighter }) {
                 আরও জানুন (Wikipedia)
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl w-[95vw] rounded-3xl overflow-hidden border-none p-0 bg-white/95 backdrop-blur-xl shadow-2xl">
-              <div className="bg-gradient-festive p-8 pb-12 text-white">
-                <div className="flex items-center justify-between mb-4">
-                  <Badge variant="secondary" className="bg-white/20 text-white border-none hover:bg-white/30">উইকিপিডিয়া সারাংশ</Badge>
-                  <Button variant="ghost" size="icon" onClick={() => setOpen(false)} className="text-white hover:bg-white/10 rounded-full">
-                    <X className="h-5 w-5" />
-                  </Button>
+            <DialogContent className="max-w-4xl w-[95vw] rounded-[2rem] overflow-hidden border-none p-0 bg-white/95 backdrop-blur-2xl shadow-2xl">
+              <div className="flex flex-col md:flex-row min-h-[450px]">
+                {/* Left Side: Image */}
+                <div className="relative w-full md:w-[40%] h-48 md:h-auto bg-gradient-festive overflow-hidden">
+                   {(wiki?.originalimage || wiki?.thumbnail) ? (
+                    <img 
+                      src={wiki.originalimage || wiki.thumbnail} 
+                      alt={f.name} 
+                      className="h-full w-full object-cover opacity-90 transition-transform duration-700 hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full gap-4 p-8">
+                      <span className="text-8xl opacity-20 drop-shadow-lg">{f.emoji ?? "🇮🇳"}</span>
+                      <p className="text-white/40 text-xs font-bold uppercase tracking-widest text-center">চিত্র উপলব্ধ নেই</p>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-black/20" />
+                  
+                  <div className="absolute bottom-6 left-6 right-6 text-white md:hidden">
+                    <h2 className="text-2xl font-display font-bold">{f.name}</h2>
+                    <p className="text-xs opacity-80 uppercase tracking-widest">{f.nameEn}</p>
+                  </div>
                 </div>
-                <h2 className="text-4xl font-display font-bold leading-tight">{f.name}</h2>
-                <p className="mt-1 text-base opacity-90 font-medium uppercase tracking-wider">{f.nameEn}</p>
-                <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-white/80">
-                  <div className="h-1 w-12 bg-white/40 rounded-full" />
-                  {f.role}
+
+                {/* Vertical Divider (Desktop Only) */}
+                <div className="hidden md:block w-[1px] bg-primary/10 self-stretch" />
+
+                {/* Right Side: Details */}
+                <div className="flex-1 flex flex-col p-6 md:p-10 bg-white/50">
+                  <div className="hidden md:block mb-8">
+                    <div className="flex items-center justify-between">
+                       <Badge variant="secondary" className="bg-primary/5 text-primary border-none text-[10px] uppercase tracking-widest px-3 py-1">ব্যক্তিত্ব প্রোফাইল</Badge>
+                       <Button variant="ghost" size="icon" onClick={() => setOpen(false)} className="rounded-full hover:bg-primary/5">
+                        <X className="h-4 w-4" />
+                       </Button>
+                    </div>
+                    <h2 className="mt-4 text-4xl font-display font-bold text-accent">{f.name}</h2>
+                    <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest">{f.nameEn}</p>
+                    <div className="mt-2 text-primary font-bold">{f.role}</div>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+                    {loading ? (
+                      <div className="flex flex-col items-center justify-center py-12 gap-3">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-sm text-muted-foreground font-medium">উইকিপিডিয়া থেকে তথ্য আসছে...</p>
+                      </div>
+                    ) : error ? (
+                      <div className="p-6 text-center bg-destructive/5 rounded-2xl border border-destructive/10">
+                        <p className="text-sm text-destructive font-medium">{error}</p>
+                      </div>
+                    ) : wiki ? (
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-primary font-bold text-[10px] uppercase tracking-widest">
+                            <BookOpen className="h-3 w-3" />
+                            সংক্ষিপ্ত জীবনী
+                          </div>
+                          <p className="text-base leading-relaxed text-foreground/80 font-medium italic">
+                            "{wiki.extract}"
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-6 border-t border-primary/5 pt-6">
+                          <div className="space-y-1">
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">জন্ম তারিখ</div>
+                            <div className="text-xs font-bold text-accent">{formatDateBn(f.birth)}</div>
+                          </div>
+                          {f.death && (
+                            <div className="space-y-1">
+                              <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">প্রয়াণ তারিখ</div>
+                              <div className="text-xs font-bold text-accent">{formatDateBn(f.death)}</div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="pt-6">
+                          <a 
+                            href={wiki.desktop_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="group flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-accent text-white font-bold hover:bg-accent/90 transition-all shadow-lg shadow-accent/20"
+                          >
+                            বিস্তারিত পড়ুন
+                            <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                          </a>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
-              
-              <div className="p-6 sm:p-10 -mt-8 bg-white rounded-t-[32px] relative z-10 min-h-[300px]">
-                {loading ? (
-                  <div className="flex flex-col items-center justify-center py-20 gap-3">
-                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground font-medium animate-pulse">তথ্য সংগ্রহ করা হচ্ছে...</p>
-                  </div>
-                ) : error ? (
-                  <div className="p-8 text-center">
-                    <div className="inline-flex p-4 rounded-full bg-destructive/5 text-destructive mb-4">
-                      <BookOpen className="h-8 w-8" />
-                    </div>
-                    <p className="text-base text-muted-foreground font-medium">{error}</p>
-                    <Button variant="outline" className="mt-6 rounded-xl border-primary/20" onClick={() => setWiki(null)}>আবার চেষ্টা করুন</Button>
-                  </div>
-                ) : wiki ? (
-                  <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-widest">
-                        <div className="p-1.5 rounded-lg bg-primary/10">
-                          <BookOpen className="h-4 w-4" />
-                        </div>
-                        সংক্ষিপ্ত জীবনী
-                      </div>
-                      <p className="text-lg leading-relaxed text-foreground/80 font-medium text-justify">
-                        {wiki.extract}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 border-y border-primary/5 py-8">
-                      <div className="space-y-1">
-                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">জন্ম তারিখ</div>
-                        <div className="text-sm font-bold text-accent">{formatDateBn(f.birth)}</div>
-                      </div>
-                      {f.death && (
-                        <div className="space-y-1">
-                          <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">প্রয়াণ তারিখ</div>
-                          <div className="text-sm font-bold text-accent">{formatDateBn(f.death)}</div>
-                        </div>
-                      )}
-                      <div className="space-y-1">
-                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">জন্মস্থান</div>
-                        <div className="text-sm font-bold text-accent truncate">{f.birthPlace || "অজানা"}</div>
-                      </div>
-                    </div>
-
-                    <div className="pt-2">
-                      <a 
-                        href={wiki.desktop_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="group flex items-center justify-center gap-3 w-full py-5 rounded-2xl bg-primary text-white font-bold hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 active:scale-[0.98]"
-                      >
-                        উইকিপিডিয়াতে বিস্তারিত পড়ুন
-                        <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-                      </a>
-                    </div>
-                  </div>
-                ) : null}
               </div>
             </DialogContent>
           </Dialog>
