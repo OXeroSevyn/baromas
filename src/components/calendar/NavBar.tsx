@@ -85,33 +85,46 @@ export function NavBar() {
           </DropdownMenu>
         </nav>
 
-        {/* Mobile/Compact Tablet Trigger */}
-        <div className="lg:hidden flex items-center gap-2">
-           {/* We keep the horizontal scroll for mobile as requested before but cleaned up */}
-        </div>
+      {/* Mobile/Compact Tablet Trigger */}
+      <div className="lg:hidden flex items-center gap-2">
+         {/* We keep the horizontal scroll for mobile as requested before but cleaned up */}
       </div>
-      
-      {/* Horizontal Scroll for all other screens */}
-      <div className="lg:hidden border-t border-border bg-secondary/30">
-        <nav className="container flex items-center gap-1 overflow-x-auto py-3 px-4 no-scrollbar">
-          {allItems.map((it) => (
+
+      {/* Fixed Bottom Navigation for Mobile */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border bg-background/80 backdrop-blur-lg pb-safe">
+        <nav className="flex items-center justify-around h-16 px-2">
+          {mainItems.slice(0, 5).map((it) => (
             <NavLink
               key={it.to}
               to={it.to}
               end={it.to === "/"}
               className={({ isActive }) =>
                 cn(
-                  "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all whitespace-nowrap",
-                  isActive 
-                    ? "bg-primary text-white shadow-md" 
-                    : "bg-white/50 text-foreground/70 border border-transparent",
+                  "flex flex-col items-center justify-center gap-1 w-full h-full transition-all",
+                  isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )
               }
             >
-              <it.icon className="h-3.5 w-3.5" />
-              {it.label}
+              <it.icon className="h-5 w-5" />
+              <span className="text-[10px] font-bold">{it.label.split(' ')[0]}</span>
             </NavLink>
           ))}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex flex-col items-center justify-center gap-1 w-full h-full text-muted-foreground outline-none">
+              <MoreHorizontal className="h-5 w-5" />
+              <span className="text-[10px] font-bold">আরো</span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="center" className="w-56 p-2 rounded-2xl shadow-xl border-orange-100 mb-2">
+              {secondaryItems.map((it) => (
+                <DropdownMenuItem key={it.to} asChild className="rounded-xl focus:bg-primary/10 focus:text-primary cursor-pointer p-0">
+                  <Link to={it.to} className="flex items-center gap-3 w-full px-4 py-3 text-sm font-bold">
+                    <it.icon className="h-4 w-4" />
+                    {it.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
       </div>
     </header>

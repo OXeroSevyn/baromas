@@ -40,6 +40,9 @@ export function TodayCard({ region, city }: { region: Region; city: CityName }) 
             <div className="text-xs uppercase tracking-wider opacity-90">আজ</div>
             <div className="mt-1 font-display text-3xl font-bold leading-tight md:text-4xl">
               {formatBanglaDate(bn)}
+              <span className="ml-2 text-[9px] font-bold leading-none text-white/70 md:text-[11px]">
+                {toBanglaNum(bn.day)}
+              </span>
             </div>
             <div className="mt-1 text-sm opacity-95">
               {bn.weekdayName} · {toBanglaNum(now.getDate())} {GREGORIAN_MONTHS_BN[now.getMonth()]}{" "}
@@ -105,12 +108,12 @@ function Stat({
   sub?: string;
 }) {
   return (
-    <div className="rounded-lg bg-secondary/40 p-3">
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+    <div className="rounded-lg bg-secondary/40 p-3 min-w-0">
+      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground truncate uppercase font-bold tracking-tighter">
         {icon} {label}
       </div>
-      <div className="mt-1 font-display text-base font-semibold text-foreground">{value}</div>
-      {sub && <div className="text-xs text-muted-foreground">{sub}</div>}
+      <div className="mt-1 font-display text-sm font-bold text-foreground truncate">{value}</div>
+      {sub && <div className="text-[10px] text-muted-foreground truncate opacity-80">{sub}</div>}
     </div>
   );
 }

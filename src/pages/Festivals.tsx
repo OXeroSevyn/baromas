@@ -38,35 +38,40 @@ const Festivals = () => {
           {settings.region === "BD" ? "বাংলাদেশ" : "পশ্চিমবঙ্গ"} অঞ্চলের জন্য — {toBanglaNum(year)} সাল
         </p>
 
-        <div className="mt-6 flex flex-wrap items-center gap-3">
-          <Input
-            placeholder="উৎসব খুঁজুন..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="max-w-xs"
-          />
-          <div className="flex gap-1">
-            {[year - 1, year, year + 1].map((y) => (
-              <button
-                key={y}
-                onClick={() => setYear(y)}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-sm font-semibold",
-                  y === year ? "bg-primary text-primary-foreground" : "bg-secondary hover:bg-primary/10",
-                )}
-              >
-                {toBanglaNum(y)}
-              </button>
-            ))}
+        <div className="mt-6 space-y-4">
+          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+            <Input
+              placeholder="উৎসব খুঁজুন..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full md:max-w-xs h-12 rounded-2xl shadow-soft border-none bg-white"
+            />
+            <div className="flex gap-2">
+              {[year - 1, year, year + 1].map((y) => (
+                <button
+                  key={y}
+                  onClick={() => setYear(y)}
+                  className={cn(
+                    "rounded-xl px-4 py-2 text-sm font-bold transition-all",
+                    y === year ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-white text-muted-foreground hover:bg-secondary",
+                  )}
+                >
+                  {toBanglaNum(y)}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="ml-auto flex flex-wrap gap-1">
+          
+          <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
             {TYPES.map((t) => (
               <button
                 key={t.value}
                 onClick={() => setType(t.value)}
                 className={cn(
-                  "rounded-full px-3 py-1 text-xs font-semibold",
-                  t.value === type ? "bg-accent text-accent-foreground" : "bg-secondary hover:bg-accent/10",
+                  "shrink-0 rounded-full px-5 py-2 text-xs font-bold transition-all border-2",
+                  t.value === type 
+                    ? "bg-accent border-accent text-white shadow-md" 
+                    : "bg-white border-transparent text-muted-foreground hover:border-accent/20",
                 )}
               >
                 {t.label}

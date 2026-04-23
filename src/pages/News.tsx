@@ -229,13 +229,13 @@ const News = () => {
                   </div>
 
                   <div className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedId === item.id ? 'max-h-[800px] mt-6 opacity-100' : 'max-h-0 opacity-0'}`}>
-                    <div className="pt-4 border-t border-primary/10 flex flex-col md:flex-row gap-6">
+                    <div className="pt-4 border-t border-primary/10 flex flex-col lg:flex-row gap-6">
                       {item.image && (
-                        <div className="md:w-1/3 shrink-0">
+                        <div className="w-full lg:w-1/3 shrink-0">
                           <img 
                             src={item.image} 
                             alt={item.title} 
-                            className="w-full aspect-video md:aspect-square object-cover rounded-2xl shadow-md border-4 border-white"
+                            className="w-full aspect-video lg:aspect-square object-cover rounded-2xl shadow-md border-4 border-white"
                             onError={(e) => {
                               (e.target as HTMLImageElement).style.display = 'none';
                             }}
