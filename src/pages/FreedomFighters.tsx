@@ -100,12 +100,13 @@ const FreedomFightersPage = () => {
 
 function FighterCard({ f }: { f: FreedomFighter }) {
   const [open, setOpen] = useState(false);
+  const [hasAttempted, setHasAttempted] = useState(false);
   const [wiki, setWiki] = useState<WikiData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (open && !wiki && !loading) {
+    if (open && !hasAttempted && !loading) {
       const fetchWiki = async () => {
         setLoading(true);
         setError(null);
@@ -116,7 +117,6 @@ function FighterCard({ f }: { f: FreedomFighter }) {
           
           if (response.ok) {
             const data = await response.json();
-            // Heuristic to check for Bengali characters to avoid accidental English content
             const hasBengali = /[\u0980-\u09FF]/.test(data.extract);
             
             if (hasBengali) {
@@ -126,24 +126,19 @@ function FighterCard({ f }: { f: FreedomFighter }) {
                 originalimage: data.originalimage?.source,
                 desktop_url: data.content_urls.desktop.page
               });
-            } else {
-              // If wiki content is English, don't set it, so it falls back to local f.description
-              setWiki(null);
             }
-          } else {
-            // No Bengali page found
-            setWiki(null);
           }
         } catch (err) {
           console.error("Wiki fetch error:", err);
-          setError("তথ্য সংগ্রহে সমস্যা হচ্ছে");
+          // We don't set a hard error here because we can fallback to f.description
         } finally {
           setLoading(false);
+          setHasAttempted(true);
         }
       };
       fetchWiki();
     }
-  }, [open, wiki, loading, f.name, f.nameEn]);
+  }, [open, hasAttempted, loading, f.name]);
 
   return (
     <Card className="group relative overflow-hidden p-0 shadow-soft transition-all duration-300 hover:shadow-xl hover:border-primary/30 border-primary/5 bg-white/60 backdrop-blur-md">
