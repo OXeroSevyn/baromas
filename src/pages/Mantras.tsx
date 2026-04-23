@@ -148,7 +148,10 @@ const Mantras = () => {
                      <Star className="h-4 w-4 text-orange-400 fill-orange-400" /> {selectedMantra.god}
                   </div>
                   
-                  <div className="text-xl md:text-2xl leading-relaxed whitespace-pre-wrap font-serif text-accent text-center mb-10">
+                  <div className={cn(
+                    "text-xl md:text-2xl leading-relaxed whitespace-pre-wrap font-serif text-accent mb-10",
+                    selectedMantra.type === "panchali" ? "text-left" : "text-center"
+                  )}>
                     {selectedMantra.content}
                   </div>
 
@@ -213,9 +216,12 @@ const Mantras = () => {
                    </div>
 
                    <div className="max-w-2xl mx-auto w-full px-6">
-                      <div className="text-xl md:text-2xl leading-[1.8] whitespace-pre-wrap font-serif text-center text-accent/90 break-words">
-                         {selectedMantra.content}
-                      </div>
+                    <div className={cn(
+                       "text-xl md:text-2xl leading-[1.8] whitespace-pre-wrap font-serif text-accent/90 break-words",
+                       selectedMantra.type === "panchali" ? "text-left" : "text-center"
+                    )}>
+                       {selectedMantra.content}
+                    </div>
                       
                       {selectedMantra.description && (
                         <div className="mt-12 p-6 bg-secondary/10 rounded-2xl border-l-4 border-primary/40 break-inside-avoid">
