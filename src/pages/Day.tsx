@@ -149,33 +149,41 @@ const Day = () => {
 
             {/* Shubho / Osubho Details */}
             <div className="grid md:grid-cols-2 gap-6">
-               <Card className="p-6 border-none shadow-soft rounded-[32px] bg-white">
-                  <h3 className="flex items-center gap-2 text-green-600 font-bold mb-5 text-lg uppercase tracking-tight">
-                    <Sparkles className="h-5 w-5" /> আজকের শুভ সময়
+               <Card className="p-8 border-none shadow-soft rounded-[32px] bg-white">
+                  <h3 className="flex items-center gap-3 text-green-600 font-bold mb-6 text-xl uppercase tracking-tight">
+                    <div className="p-2 bg-green-50 rounded-xl">
+                      <Sparkles className="h-6 w-6" />
+                    </div>
+                    আজকের শুভ সময়
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                      {shubhoTimes.map((s, i) => (
-                       <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-green-50 border border-green-100">
-                          <span className="font-bold text-green-800 text-base">{s.name}</span>
-                          <span className="font-display font-semibold text-green-700 text-lg">
+                       <div key={i} className="group p-5 rounded-2xl bg-green-50/50 border border-green-100 hover:bg-green-50 transition-colors">
+                          <div className="text-green-800 font-bold text-lg mb-1">{s.name}</div>
+                          <div className="font-display font-semibold text-green-600 text-xl flex items-center gap-2">
+                             <Clock className="h-4 w-4 opacity-70" />
                              {formatTimeBangla(s.start, tz)} – {formatTimeBangla(s.end, tz)}
-                          </span>
+                          </div>
                        </div>
                      ))}
                   </div>
                </Card>
 
-               <Card className="p-6 border-none shadow-soft rounded-[32px] bg-white">
-                  <h3 className="flex items-center gap-2 text-destructive font-bold mb-5 text-lg uppercase tracking-tight">
-                    <AlertTriangle className="h-5 w-5" /> আজকের অশুভ সময়
+               <Card className="p-8 border-none shadow-soft rounded-[32px] bg-white">
+                  <h3 className="flex items-center gap-3 text-destructive font-bold mb-6 text-xl uppercase tracking-tight">
+                    <div className="p-2 bg-destructive/5 rounded-xl">
+                      <AlertTriangle className="h-6 w-6" />
+                    </div>
+                    আজকের অশুভ সময়
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                      {inauspiciousTimes.filter(p => ["কালবেলা", "রাহু কাল", "যমগণ্ড"].includes(p.name)).map((s, i) => (
-                       <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-destructive/5 border border-destructive/10">
-                          <span className="font-bold text-destructive text-base">{s.name}</span>
-                          <span className="font-display font-semibold text-destructive/80 text-lg">
+                       <div key={i} className="group p-5 rounded-2xl bg-destructive/[0.02] border border-destructive/10 hover:bg-destructive/[0.05] transition-colors">
+                          <div className="text-destructive font-bold text-lg mb-1">{s.name}</div>
+                          <div className="font-display font-semibold text-destructive/80 text-xl flex items-center gap-2">
+                             <Clock className="h-4 w-4 opacity-70" />
                              {formatTimeBangla(s.start, tz)} – {formatTimeBangla(s.end, tz)}
-                          </span>
+                          </div>
                        </div>
                      ))}
                   </div>
