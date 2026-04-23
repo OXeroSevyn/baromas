@@ -252,7 +252,8 @@ const News = () => {
                             alt={item.title} 
                             className="w-full h-full object-cover aspect-video lg:aspect-auto lg:h-full transition-transform duration-1000 group-hover/img:scale-110"
                             onError={(e) => {
-                              (e.target as HTMLImageElement).parentElement?.style.display = 'none';
+                               const target = e.target as HTMLImageElement;
+                               if (target.parentElement) target.parentElement.style.display = 'none';
                             }}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-700" />
