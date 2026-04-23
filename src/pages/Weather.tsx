@@ -3,45 +3,56 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
   Cloud, Sun, CloudRain, Wind, Droplets, Navigation, 
-  Thermometer, MapPin, RefreshCcw, CloudSun 
+  Thermometer, MapPin, RefreshCcw, CloudSun, Sunrise, Sunset,
+  CloudLightning, CloudFog, Snowflake, Waves
 } from "lucide-react";
-import { toBanglaNum } from "@/lib/bangla-calendar";
+import { toBanglaNum, CITIES, CityName, sunTimes } from "@/lib/bangla-calendar";
 import { useEffect, useState } from "react";
 import { useSettings } from "@/hooks/use-settings";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface WeatherData {
   temp: number;
   condition: string;
+  conditionCode: number;
   humidity: number;
   wind: number;
   rain: number;
   isDay: boolean;
   city: string;
+  sunrise: string;
+  sunset: string;
+  daily: {
+    date: string;
+    code: number;
+    max: number;
+    min: number;
+  }[];
 }
 
 const Weather = () => {
-  const [settings] = useSettings();
+  const [settings, updateSettings] = useSettings();
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchWeather = async () => {
+  const fetchWeather = async (cityName?: string) => {
     setLoading(true);
     try {
-      const city = settings?.city || "Kolkata";
-      // Coordinates for major cities
-      const coords: Record<string, { lat: number; lon: number }> = {
-        "Kolkata": { lat: 22.5726, lon: 88.3639 },
-        "Dhaka": { lat: 23.8103, lon: 90.4125 },
-        "Siliguri": { lat: 26.7271, lon: 88.3953 },
-        "Durgapur": { lat: 23.5204, lon: 87.3119 },
-      };
-
-      const { lat, lon } = coords[city] || coords["Kolkata"];
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,is_day,precipitation,weather_code,wind_speed_10m&timezone=auto`;
+      const city = (cityName as CityName) || settings?.city || "Kolkata";
+      const c = CITIES[city];
+      
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&current=temperature_2m,relative_humidity_2m,is_day,precipitation,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
       
       const response = await fetch(url);
       const data = await response.json();
       const current = data.current;
+      const daily = data.daily;
 
       // Weather code to text mapping
       const getCondition = (code: number) => {
@@ -54,14 +65,28 @@ const Weather = () => {
         return "বজ্রবিদ্যুৎ সহ বৃষ্টি";
       };
 
+      const { sunrise, sunset } = sunTimes(new Date(), c.lat, c.lon);
+      const formatTime = (d: Date) => {
+        return toBanglaNum(d.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit', hour12: true }));
+      };
+
       setWeather({
         temp: Math.round(current.temperature_2m),
         condition: getCondition(current.weather_code),
+        conditionCode: current.weather_code,
         humidity: current.relative_humidity_2m,
         wind: Math.round(current.wind_speed_10m),
         rain: current.precipitation,
         isDay: current.is_day === 1,
-        city: city
+        city: c.label,
+        sunrise: formatTime(sunrise),
+        sunset: formatTime(sunset),
+        daily: daily.time.map((time: string, i: number) => ({
+          date: time,
+          code: daily.weather_code[i],
+          max: Math.round(daily.temperature_2m_max[i]),
+          min: Math.round(daily.temperature_2m_min[i])
+        }))
       });
     } catch (error) {
       console.error("Error fetching weather:", error);
@@ -74,99 +99,227 @@ const Weather = () => {
     fetchWeather();
   }, [settings?.city]);
 
+  const getWeatherIcon = (code: number, isDay = true, size = "h-8 w-8") => {
+    if (code === 0) return <Sun className={`${size} text-orange-400`} />;
+    if (code <= 3) return isDay ? <CloudSun className={`${size} text-yellow-400`} /> : <Cloud className={`${size} text-blue-300`} />;
+    if (code <= 48) return <CloudFog className={`${size} text-gray-400`} />;
+    if (code <= 67) return <CloudRain className={`${size} text-blue-400`} />;
+    if (code <= 77) return <Snowflake className={`${size} text-blue-200`} />;
+    if (code <= 82) return <Waves className={`${size} text-blue-600`} />;
+    return <CloudLightning className={`${size} text-purple-400`} />;
+  };
+
+  const getDayName = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const today = new Date();
+    if (date.toDateString() === today.toDateString()) return "আজ";
+    return date.toLocaleDateString('bn-BD', { weekday: 'long' });
+  };
+
   return (
     <PageShell>
-      <div className="container py-6 animate-fade-in">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="font-display text-4xl font-bold text-accent">আবহাওয়া</h1>
-            <p className="text-muted-foreground mt-1 flex items-center gap-1">
-              <MapPin className="h-4 w-4" /> {weather?.city || settings?.city || "কলকাতা"} এর বর্তমান পরিস্থিতি
-            </p>
+      <div className="container py-6 animate-fade-in max-w-5xl">
+        <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="bg-primary/10 p-3 rounded-2xl">
+               <CloudSun className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="font-display text-4xl font-bold text-accent">আবহাওয়া আপডেট</h1>
+              <p className="text-muted-foreground mt-1 flex items-center gap-2 font-medium">
+                <MapPin className="h-4 w-4 text-primary" /> 
+                {weather?.city} শহর ও পার্শ্ববর্তী অঞ্চলের আবহাওয়া
+              </p>
+            </div>
           </div>
-          <button 
-            onClick={fetchWeather}
-            disabled={loading}
-            className="p-3 bg-card border rounded-xl hover:bg-secondary transition-all disabled:opacity-50"
-          >
-            <RefreshCcw className={`h-5 w-5 text-primary ${loading ? 'animate-spin' : ''}`} />
-          </button>
+          
+          <div className="flex items-center gap-3">
+            <Select 
+              value={settings?.city} 
+              onValueChange={(v) => updateSettings({ city: v as CityName })}
+            >
+              <SelectTrigger className="w-[180px] rounded-2xl border-2 border-primary/20 bg-white shadow-soft h-12 font-bold text-accent">
+                <SelectValue placeholder="শহর বেছে নিন" />
+              </SelectTrigger>
+              <SelectContent className="rounded-2xl border-primary/10 shadow-xl">
+                {Object.entries(CITIES).map(([id, c]) => (
+                  <SelectItem key={id} value={id} className="font-bold cursor-pointer">
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <button 
+              onClick={() => fetchWeather()}
+              disabled={loading}
+              className="p-3 bg-white border-2 border-primary/20 rounded-2xl shadow-soft hover:bg-primary/5 transition-all disabled:opacity-50 text-primary"
+            >
+              <RefreshCcw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
         </div>
 
         {loading && !weather ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {[1, 2, 3, 4].map(i => (
-              <Card key={i} className="h-32 animate-pulse bg-muted" />
-            ))}
+          <div className="space-y-8">
+            <Card className="h-[300px] animate-pulse bg-muted rounded-3xl" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+               {[1, 2, 3, 4].map(i => (
+                 <Card key={i} className="h-32 animate-pulse bg-muted rounded-3xl" />
+               ))}
+            </div>
           </div>
         ) : weather ? (
-          <div className="space-y-6">
-            <Card className="p-8 bg-gradient-to-br from-primary/10 via-background to-secondary/30 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-10 opacity-10">
-                 {weather.isDay ? <Sun className="h-40 w-40" /> : <CloudSun className="h-40 w-40" />}
+          <div className="space-y-8">
+            {/* Hero Weather Card */}
+            <Card className="relative overflow-hidden border-none shadow-2xl rounded-[40px] bg-gradient-to-br from-primary/5 via-background to-accent/5">
+              <div className="absolute top-0 right-0 -mr-16 -mt-16 opacity-10 blur-2xl">
+                 {getWeatherIcon(weather.conditionCode, weather.isDay, "h-96 w-96")}
               </div>
               
-              <div className="flex flex-col md:flex-row md:items-center gap-8 relative z-10">
-                <div className="text-center md:text-left">
-                  <div className="text-7xl font-display font-bold text-accent mb-2">
-                    {toBanglaNum(weather.temp)}°<span className="text-3xl text-muted-foreground font-normal">C</span>
-                  </div>
-                  <Badge className="text-lg px-4 py-1 bg-primary/20 text-primary border-none">
-                    {weather.condition}
+              <div className="p-8 md:p-12 flex flex-col md:flex-row md:items-center justify-between gap-12 relative z-10">
+                <div className="space-y-6">
+                  <Badge className="bg-primary text-white px-6 py-2 rounded-full text-lg font-bold shadow-lg shadow-primary/20">
+                    {weather.isDay ? "আজকের দিন" : "আজকের রাত"}
                   </Badge>
+                  <div>
+                    <div className="text-8xl md:text-9xl font-display font-bold text-accent flex items-start gap-2">
+                      {toBanglaNum(weather.temp)}<span className="text-4xl md:text-5xl mt-4 font-normal text-muted-foreground">°C</span>
+                    </div>
+                    <div className="flex items-center gap-4 mt-4">
+                       <div className="p-3 bg-white shadow-soft rounded-2xl">
+                         {getWeatherIcon(weather.conditionCode, weather.isDay, "h-10 w-10")}
+                       </div>
+                       <div className="text-2xl font-bold text-accent">{weather.condition}</div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 flex-1">
-                  <div className="flex flex-col items-center p-4 bg-white/40 rounded-2xl backdrop-blur-sm shadow-soft">
-                    <Droplets className="h-6 w-6 text-blue-500 mb-2" />
-                    <span className="text-xs font-bold text-muted-foreground">আর্দ্রতা</span>
-                    <span className="text-xl font-bold text-accent">{toBanglaNum(weather.humidity)}%</span>
+                <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
+                  <div className="p-6 bg-white/60 backdrop-blur-md rounded-3xl shadow-soft border border-white/50 flex flex-col items-center justify-center text-center">
+                    <Droplets className="h-8 w-8 text-blue-500 mb-3" />
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">আর্দ্রতা</span>
+                    <span className="text-2xl font-bold text-accent">{toBanglaNum(weather.humidity)}%</span>
                   </div>
-                  <div className="flex flex-col items-center p-4 bg-white/40 rounded-2xl backdrop-blur-sm shadow-soft">
-                    <Wind className="h-6 w-6 text-teal-500 mb-2" />
-                    <span className="text-xs font-bold text-muted-foreground">বাতাস</span>
-                    <span className="text-xl font-bold text-accent">{toBanglaNum(weather.wind)} কিমি/ঘ</span>
+                  <div className="p-6 bg-white/60 backdrop-blur-md rounded-3xl shadow-soft border border-white/50 flex flex-col items-center justify-center text-center">
+                    <Wind className="h-8 w-8 text-teal-500 mb-3" />
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">বাতাস</span>
+                    <span className="text-2xl font-bold text-accent">{toBanglaNum(weather.wind)}<span className="text-sm"> কিমি/ঘ</span></span>
                   </div>
-                  <div className="flex flex-col items-center p-4 bg-white/40 rounded-2xl backdrop-blur-sm shadow-soft">
-                    <CloudRain className="h-6 w-6 text-indigo-500 mb-2" />
-                    <span className="text-xs font-bold text-muted-foreground">বৃষ্টিপাত</span>
-                    <span className="text-xl font-bold text-accent">{toBanglaNum(weather.rain)} মিমি</span>
+                  <div className="p-6 bg-white/60 backdrop-blur-md rounded-3xl shadow-soft border border-white/50 flex flex-col items-center justify-center text-center">
+                    <Sunrise className="h-8 w-8 text-orange-400 mb-3" />
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">সূর্যোদয়</span>
+                    <span className="text-xl font-bold text-accent">{weather.sunrise}</span>
                   </div>
-                  <div className="flex flex-col items-center p-4 bg-white/40 rounded-2xl backdrop-blur-sm shadow-soft">
-                    <Navigation className="h-6 w-6 text-orange-500 mb-2" />
-                    <span className="text-xs font-bold text-muted-foreground">দৃষ্টিসীমা</span>
-                    <span className="text-xl font-bold text-accent">{toBanglaNum(10)} কিমি</span>
+                  <div className="p-6 bg-white/60 backdrop-blur-md rounded-3xl shadow-soft border border-white/50 flex flex-col items-center justify-center text-center">
+                    <Sunset className="h-8 w-8 text-orange-600 mb-3" />
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">সূর্যাস্ত</span>
+                    <span className="text-xl font-bold text-accent">{weather.sunset}</span>
                   </div>
                 </div>
               </div>
             </Card>
 
-            <div className="grid gap-6 md:grid-cols-3">
-              <Card className="p-6 shadow-soft flex items-center gap-4 border-l-4 border-l-orange-400">
-                <Thermometer className="h-10 w-10 text-orange-400" />
-                <div>
-                   <div className="text-sm font-bold text-muted-foreground">সর্বোচ্চ তাপমাত্রা</div>
-                   <div className="text-2xl font-bold text-accent">{toBanglaNum(weather.temp + 4)}°C</div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Daily Forecast */}
+              <Card className="lg:col-span-2 p-8 rounded-[40px] shadow-warm border-none bg-white">
+                <div className="flex items-center justify-between mb-8">
+                   <h3 className="text-2xl font-bold text-accent flex items-center gap-3">
+                     <RefreshCcw className="h-6 w-6 text-primary" /> আগাম ৭ দিনের পূর্বাভাস
+                   </h3>
+                </div>
+                <div className="space-y-6">
+                  {weather.daily.map((day, i) => (
+                    <div key={i} className="flex items-center justify-between p-4 hover:bg-secondary/30 rounded-2xl transition-colors group">
+                      <div className="w-32 font-bold text-accent">
+                        {getDayName(day.date)}
+                      </div>
+                      <div className="flex-1 flex items-center gap-4">
+                        <div className="p-2 bg-primary/5 rounded-xl group-hover:bg-primary group-hover:text-white transition-colors">
+                           {getWeatherIcon(day.code, true, "h-6 w-6")}
+                        </div>
+                        <div className="text-sm font-medium text-muted-foreground hidden md:block">
+                          {day.code <= 3 ? "পরিষ্কার" : day.code <= 67 ? "বৃষ্টির সম্ভাবনা" : "মেঘলা"}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-6">
+                         <div className="flex flex-col items-end">
+                            <span className="text-xs font-bold text-muted-foreground uppercase">সর্বোচ্চ</span>
+                            <span className="text-lg font-bold text-accent">{toBanglaNum(day.max)}°</span>
+                         </div>
+                         <div className="flex flex-col items-end">
+                            <span className="text-xs font-bold text-muted-foreground uppercase">সর্বনিম্ন</span>
+                            <span className="text-lg font-bold text-muted-foreground">{toBanglaNum(day.min)}°</span>
+                         </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </Card>
-              <Card className="p-6 shadow-soft flex items-center gap-4 border-l-4 border-l-blue-400">
-                <Thermometer className="h-10 w-10 text-blue-400" />
-                <div>
-                   <div className="text-sm font-bold text-muted-foreground">সর্বনিম্ন তাপমাত্রা</div>
-                   <div className="text-2xl font-bold text-accent">{toBanglaNum(weather.temp - 3)}°C</div>
-                </div>
-              </Card>
-              <Card className="p-6 shadow-soft flex items-center gap-4 border-l-4 border-l-indigo-400">
-                <Cloud className="h-10 w-10 text-indigo-400" />
-                <div>
-                   <div className="text-sm font-bold text-muted-foreground">মেঘের ঘনত্ব</div>
-                   <div className="text-2xl font-bold text-accent">{toBanglaNum(45)}%</div>
-                </div>
-              </Card>
+
+              {/* Extra Stats */}
+              <div className="space-y-6">
+                <Card className="p-6 shadow-soft rounded-[32px] border-none bg-gradient-to-br from-orange-400 to-orange-600 text-white">
+                  <div className="flex items-center gap-4 mb-4">
+                     <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-md">
+                        <Thermometer className="h-6 w-6" />
+                     </div>
+                     <h4 className="font-bold">তাপমাত্রার পরিস্থিতি</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center bg-white/10 p-3 rounded-xl">
+                      <span className="text-sm font-medium">সর্বোচ্চ তাপমাত্রা</span>
+                      <span className="text-xl font-bold">{toBanglaNum(weather.daily[0].max)}°C</span>
+                    </div>
+                    <div className="flex justify-between items-center bg-white/10 p-3 rounded-xl">
+                      <span className="text-sm font-medium">সর্বনিম্ন তাপমাত্রা</span>
+                      <span className="text-xl font-bold">{toBanglaNum(weather.daily[0].min)}°C</span>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-6 shadow-soft rounded-[32px] border-none bg-white">
+                  <h4 className="font-bold text-accent mb-6 flex items-center gap-2">
+                    <Navigation className="h-5 w-5 text-primary" /> অন্যান্য তথ্য
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-2xl">
+                      <div className="flex items-center gap-3">
+                         <CloudRain className="h-5 w-5 text-blue-500" />
+                         <span className="text-sm font-bold text-accent">বৃষ্টিপাত</span>
+                      </div>
+                      <span className="font-bold text-primary">{toBanglaNum(weather.rain)} মিমি</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-2xl">
+                      <div className="flex items-center gap-3">
+                         <Navigation className="h-5 w-5 text-teal-500" />
+                         <span className="text-sm font-bold text-accent">দৃষ্টিসীমা</span>
+                      </div>
+                      <span className="font-bold text-primary">{toBanglaNum(10)} কিমি</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-2xl">
+                      <div className="flex items-center gap-3">
+                         <Sun className="h-5 w-5 text-orange-400" />
+                         <span className="text-sm font-bold text-accent">UV ইনডেক্স</span>
+                      </div>
+                      <span className="font-bold text-primary">{toBanglaNum(6)} (মাঝারি)</span>
+                    </div>
+                  </div>
+                </Card>
+              </div>
             </div>
           </div>
         ) : (
-          <p className="text-center py-20 text-muted-foreground">আবহাওয়া তথ্য পাওয়া যাচ্ছে না।</p>
+          <div className="text-center py-20 bg-card border-2 border-dashed rounded-[40px]">
+             <CloudRain className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-20" />
+             <p className="text-muted-foreground font-bold text-xl">আবহাওয়া তথ্য পাওয়া যাচ্ছে না।</p>
+             <button 
+              onClick={() => fetchWeather()}
+              className="mt-6 text-primary font-bold hover:underline"
+             >
+               আবার চেষ্টা করুন
+             </button>
+          </div>
         )}
       </div>
     </PageShell>

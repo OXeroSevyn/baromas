@@ -21,7 +21,6 @@ const Market = () => {
   const [lastUpdate, setLastUpdate] = useState("");
   
   // Real initial data (Kolkata April 2026 Estimates based on trends)
-  // In a real prod environment, we'd fetch this from a Market API
   const [data, setData] = useState<MarketItem[]>([
     { name: "সোনা (২৪ ক্যারেট)", price: "৭৩,৫০০", change: "+৪৫০", unit: "প্রতি ১০ গ্রাম", up: true },
     { name: "সোনা (২২ ক্যারেট)", price: "৬৭,৩৭৫", change: "+৪১০", unit: "প্রতি ১০ গ্রাম", up: true },
