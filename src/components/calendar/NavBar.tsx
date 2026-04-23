@@ -84,6 +84,7 @@ export function NavBar() {
             </DropdownMenuContent>
           </DropdownMenu>
         </nav>
+      </div>
 
       {/* Mobile/Compact Tablet Trigger */}
       <div className="lg:hidden flex items-center gap-2">
