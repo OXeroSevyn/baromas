@@ -209,6 +209,10 @@
 }
 
 @media print {
+  @page {
+    margin: 0; /* This removes browser-added headers and footers (URL, page numbers, etc.) */
+  }
+
   /* Hide everything by default */
   body > * { display: none !important; }
   
@@ -220,7 +224,7 @@
     top: 0 !important;
     width: 100% !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 1.5cm !important; /* Add some padding since @page margin is 0 */
   }
 
   /* Ensure background and colors are preserved if needed, but standard print is black on white */
