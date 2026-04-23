@@ -205,47 +205,29 @@ function FighterCard({ f }: { f: FreedomFighter }) {
                 আরও জানুন (Wikipedia)
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-3xl w-[90vw] h-[500px] md:h-[450px] rounded-[2rem] overflow-hidden border-none p-0 bg-white/95 backdrop-blur-2xl shadow-2xl flex flex-col md:flex-row">
-                {/* Left Side: Image Panel */}
-                <div className="relative w-full md:w-[35%] h-40 md:h-full bg-gradient-festive shrink-0 overflow-hidden">
-                   {(wiki?.originalimage || wiki?.thumbnail) ? (
-                    <img 
-                      src={wiki.originalimage || wiki.thumbnail} 
-                      alt={f.name} 
-                      className="h-full w-full object-cover opacity-90"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-full gap-3 p-6 text-white/30">
-                      <span className="text-7xl drop-shadow-lg">{f.emoji ?? "🇮🇳"}</span>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-center">চিত্র নেই</p>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-black/10" />
-                </div>
-
-                {/* Vertical Divider */}
-                <div className="hidden md:block w-[1px] bg-primary/5 self-stretch" />
-
-                {/* Right Side: Information Panel */}
-                <div className="flex-1 flex flex-col min-w-0 bg-white/40">
-                  {/* Header */}
-                  <div className="p-6 md:p-8 pb-4 border-b border-primary/5">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="min-w-0">
-                        <h2 className="text-2xl md:text-3xl font-display font-bold text-accent truncate">{f.name}</h2>
-                        <div className="mt-1 flex items-center gap-2">
-                          <span className="h-1 w-8 bg-primary/30 rounded-full" />
-                          <p className="text-xs text-primary font-bold uppercase tracking-wider">{f.role}</p>
-                        </div>
+            <DialogContent className="max-w-2xl p-0 overflow-hidden bg-white/95 backdrop-blur-2xl border-none shadow-2xl max-h-[85vh] flex flex-col">
+              <div className="flex h-full flex-col">
+                {/* Information Area */}
+                <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                  {/* Header with Title */}
+                  <div className="p-6 md:p-8 pb-0 border-b border-primary/5">
+                    <DialogHeader className="text-left space-y-3 pt-2">
+                      <DialogTitle className="text-3xl md:text-4xl font-bold text-primary leading-[1.3] py-1">
+                        {f.name}
+                      </DialogTitle>
+                      <div className="flex items-center gap-3">
+                        <div className="h-1 w-12 bg-primary/20 rounded-full shrink-0" />
+                        <p className="text-sm md:text-base font-semibold text-accent leading-tight">
+                          {f.role}
+                        </p>
                       </div>
-                      {/* Note: Shadcn Dialog includes a default close button, so we don't need a manual one here unless we hide the default one */}
-                    </div>
+                    </DialogHeader>
                   </div>
 
-                  {/* Content - Scrollable */}
-                  <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 pt-4">
+                  {/* Content Area */}
+                  <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 pt-6">
                     {loading ? (
-                      <div className="flex flex-col items-center justify-center h-full gap-3 py-12">
+                      <div className="flex flex-col items-center justify-center h-48 gap-3">
                         <Loader2 className="h-8 w-8 animate-spin text-primary/60" />
                         <p className="text-xs text-muted-foreground font-medium animate-pulse">লোড হচ্ছে...</p>
                       </div>
