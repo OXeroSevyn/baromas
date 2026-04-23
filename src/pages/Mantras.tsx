@@ -183,57 +183,60 @@ const Mantras = () => {
           </div>
         )}
 
-        {/* Specialized Print Template (Hidden from Screen, Visible on Print) */}
+        {/* Specialized Print Template (Visible only on Print) */}
         {selectedMantra && (
-          <div id="print-mantra" className="hidden print:block fixed inset-0 z-[100] bg-white p-12 text-black overflow-visible">
-             <div className="border-4 border-double border-primary/30 p-10 h-full relative">
-                {/* Branding */}
-                <div className="flex items-center justify-between mb-12 pb-8 border-b-2 border-primary/10">
+          <div id="print-mantra" className="hidden print:block bg-white text-black min-h-screen">
+             <div className="p-8 md:p-12 flex flex-col min-h-screen border-[12px] border-double border-primary/10">
+                {/* Branding Header */}
+                <div className="flex items-center justify-between mb-10 pb-6 border-b border-primary/20">
                    <div className="flex items-center gap-4">
-                      <img src="/branding/logo-color.png" alt="Logo" className="h-16 w-16" />
-                      <div>
-                         <h1 className="text-3xl font-bold text-primary">বারোমাস</h1>
-                         <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">বাংলার সময় ও সংস্কৃতি</p>
+                      <img src="/branding/logo-color.png" alt="Logo" className="h-12 w-12" />
+                      <div className="flex flex-col">
+                         <h1 className="text-2xl font-bold text-primary leading-tight">বারোমাস</h1>
+                         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">বাংলার সময় ও সংস্কৃতি</p>
                       </div>
                    </div>
-                   <div className="text-right">
+                   <div className="text-right flex flex-col justify-end">
                       <div className="text-sm font-bold text-accent">{toBanglaNum(new Date().toLocaleDateString('bn-BD'))}</div>
-                      <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Mantra & Panchali Series</div>
+                      <div className="text-[9px] uppercase tracking-widest text-primary/50 font-bold">Devotional Series</div>
                    </div>
                 </div>
 
-                {/* Content */}
-                <div className="text-center mb-10">
-                   <Badge className="bg-primary/10 text-primary border-none mb-4 uppercase text-xs font-bold px-4 py-1">
-                      {selectedMantra.type === "mantra" ? "প্রণাম মন্ত্র" : "ব্রতকথা ও পাঁচালী"}
-                   </Badge>
-                   <h2 className="text-4xl font-bold text-accent">{selectedMantra.name}</h2>
-                   <div className="w-24 h-1 bg-primary/20 mx-auto mt-6" />
+                {/* Content Section */}
+                <div className="flex-1 flex flex-col">
+                   <div className="text-center mb-10">
+                      <div className="inline-block px-4 py-1 bg-primary/5 rounded-full text-[10px] font-bold text-primary uppercase mb-3">
+                         {selectedMantra.type === "mantra" ? "প্রণাম মন্ত্র" : "ব্রতকথা ও পাঁচালী"}
+                      </div>
+                      <h2 className="text-3xl font-bold text-accent leading-tight">{selectedMantra.name}</h2>
+                      <div className="w-16 h-0.5 bg-primary/20 mx-auto mt-4" />
+                   </div>
+
+                   <div className="max-w-2xl mx-auto w-full px-6">
+                      <div className="text-xl md:text-2xl leading-[1.8] whitespace-pre-wrap font-serif text-center text-accent/90 break-words">
+                         {selectedMantra.content}
+                      </div>
+                      
+                      {selectedMantra.description && (
+                        <div className="mt-12 p-6 bg-secondary/10 rounded-2xl border-l-4 border-primary/40 break-inside-avoid">
+                           <h4 className="font-bold text-accent text-sm mb-2">মাহাত্ম্য ও নিয়ম:</h4>
+                           <p className="text-xs text-muted-foreground leading-relaxed italic">
+                              {selectedMantra.description}
+                           </p>
+                        </div>
+                      )}
+                   </div>
                 </div>
 
-                <div className="max-w-2xl mx-auto">
-                   <div className="text-2xl leading-relaxed whitespace-pre-wrap font-serif text-center italic text-accent/90">
-                      {selectedMantra.content}
+                {/* Footer Section */}
+                <div className="mt-12 pt-6 border-t border-primary/10 flex justify-between items-end text-[9px] text-muted-foreground/60">
+                   <div className="flex flex-col gap-1">
+                      <p>© ২০২৬ বারোমাস - সর্বস্বত্ব সংরক্ষিত।</p>
+                      <p className="font-bold text-primary/40 italic">ডাউনলোড করুন: baromas.app</p>
                    </div>
-                   
-                   {selectedMantra.description && (
-                     <div className="mt-16 p-6 bg-secondary/30 rounded-2xl border-l-4 border-primary">
-                        <h4 className="font-bold text-accent mb-2">মাহাত্ম্য:</h4>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                           {selectedMantra.description}
-                        </p>
-                     </div>
-                   )}
-                </div>
-
-                {/* Footer */}
-                <div className="absolute bottom-10 left-10 right-10 pt-8 border-t border-primary/10 flex justify-between items-end">
-                   <div className="text-[10px] text-muted-foreground italic">
-                      © ২০২৬ বারোমাস - সর্বস্বত্ব সংরক্ষিত। <br /> 
-                      ডাউনলোড করুন: baromas.app
-                   </div>
-                   <div className="opacity-10 h-24 w-24">
-                      <img src="/branding/logo-color.png" alt="Logo" className="grayscale" />
+                   <div className="flex flex-col items-end">
+                      <img src="/branding/logo-color.png" alt="Logo" className="h-10 w-10 opacity-10 grayscale mb-2" />
+                      <span className="italic tracking-widest uppercase text-[8px]">Sanatan Dharma - Heritage</span>
                    </div>
                 </div>
              </div>
