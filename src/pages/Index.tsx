@@ -21,6 +21,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { BengaliWikiDialog } from "@/components/calendar/BengaliWikiDialog";
+import { BookOpen } from "lucide-react";
 
 // Helper components moved to top for absolute safety
 function QuickLink({ to, label, emoji, image }: { to: string; label: string; emoji: string; image?: string }) {
@@ -146,28 +148,51 @@ const Index = () => {
             <PanjikaCard region={region} city={city} />
 
             {recipe && (
-              <Card className="overflow-hidden border-2 border-festive/10 p-5 shadow-soft bg-gradient-to-br from-background to-festive/5">
-                <div className="text-xs font-semibold uppercase tracking-wide text-festive mb-2">
-                  ঋতুর রন্ধন
+              <Card className="overflow-hidden border-2 border-festive/10 p-5 shadow-soft bg-gradient-to-br from-background to-festive/5 group relative">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-festive">
+                    ঋতুর রন্ধন
+                  </div>
+                  <BengaliWikiDialog 
+                    query={bn.ritu}
+                    title={`${bn.ritu} ঋতু`}
+                    subtitle="বাংলার ছয় ঋতু"
+                    trigger={
+                      <button className="text-[10px] font-bold text-primary hover:underline transition-all">ঋতু সম্পর্কে জানুন</button>
+                    }
+                  />
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-background shadow-inner overflow-hidden">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-background shadow-inner overflow-hidden ring-2 ring-white/50">
                     {recipe.image ? (
                       <img src={recipe.image} alt={recipe.name} className="h-full w-full object-cover" />
                     ) : (
                       <span className="text-4xl">🥘</span>
                     )}
                   </div>
-                  <div>
-                    <div className="font-display text-xl font-bold text-accent">{recipe.name}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <div className="font-display text-xl font-bold text-accent">{recipe.name}</div>
+                      <BengaliWikiDialog 
+                        query={recipe.name}
+                        title={recipe.name}
+                        subtitle={`${bn.ritu} ঋতুর খাবার`}
+                        fallbackText={recipe.description}
+                        trigger={
+                          <button className="p-1.5 rounded-lg bg-primary/5 text-primary hover:bg-primary/10 transition-colors">
+                            <BookOpen className="h-3.5 w-3.5" />
+                          </button>
+                        }
+                      />
+                    </div>
                     <div className="text-sm text-muted-foreground">{bn.ritu} ঋতুর বিশেষ স্বাদ</div>
-                    <p className="mt-2 text-sm line-clamp-2">{recipe.description}</p>
+                    <p className="mt-2 text-sm line-clamp-2 text-foreground/70">{recipe.description}</p>
                   </div>
                 </div>
               </Card>
             )}
 
-            <Card className="p-5 shadow-soft bg-gradient-to-br from-background to-secondary/30">
+            <Card className="p-5 shadow-soft bg-gradient-to-br from-background to-secondary/30 border-primary/5">
               <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-4">
                 দ্রুত অ্যাক্সেস
               </div>
@@ -181,39 +206,56 @@ const Index = () => {
                 <QuickLink to="/festivals" label="উৎসব" emoji="✨" image="/branding/icons/festivals.png" />
                 <QuickLink to="/election-day" label="নির্বাচনী দিন" emoji="🗳️" image="/branding/icons/election.png" />
                 <QuickLink to="/tools" label="টুলস" emoji="🛠️" image="/branding/icons/tools.png" />
+                <QuickLink to="/freedom-fighters" label="দেশপ্রেমী" emoji="🇮🇳" />
               </div>
             </Card>
           </div>
         </div>
       </section>
 
-      <section className="bg-secondary/20 py-6">
+      <section className="bg-secondary/20 py-8">
         <div className="container">
-          <div className="mb-3">
+          <div className="mb-6 flex items-center justify-between">
             <h2 className="font-display text-2xl font-bold text-accent">সাহিত্য ও সংস্কৃতি</h2>
           </div>
-          <div className="mb-4">
+          <div className="mb-6">
             <QuoteOfDay />
           </div>
 
           {historical && historical.length > 0 && (
-            <Card className="p-6 shadow-soft border-l-4 border-l-accent overflow-hidden relative max-w-3xl mx-auto">
-              <div className="absolute top-0 right-0 p-2 opacity-5 pointer-events-none">
-                <ChevronRight className="h-24 w-24 -rotate-12" />
+            <Card className="p-6 shadow-soft border-l-4 border-l-accent overflow-hidden relative max-w-3xl mx-auto bg-white/60 backdrop-blur-md">
+              <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
+                <BookOpen className="h-32 w-32 -rotate-12" />
               </div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-accent mb-3">
+              <div className="text-xs font-semibold uppercase tracking-wide text-accent mb-4 flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
                 ইতিহাসে আজকের দিন
               </div>
-              <ul className="grid gap-4 md:grid-cols-2 relative">
+              <div className="grid gap-6 md:grid-cols-2 relative">
                 {historical.slice(0, 4).map((h, i) => (
-                  <li key={i} className="text-sm leading-relaxed">
-                    <span className="font-display font-bold text-primary">
-                      {toBanglaNum(h.year)}:
-                    </span>{" "}
-                    {h.text}
-                  </li>
+                  <div key={i} className="group relative pl-4 border-l border-accent/10 hover:border-accent transition-colors">
+                    <div className="font-display text-lg font-bold text-primary mb-1">
+                      {toBanglaNum(h.year)}
+                    </div>
+                    <p className="text-sm leading-relaxed text-foreground/80 line-clamp-3">
+                      {h.text}
+                    </p>
+                    <div className="mt-2">
+                      <BengaliWikiDialog 
+                        query={h.text.split(" ").slice(0, 3).join(" ")} // Heuristic query
+                        title={`ইতিহাস: ${toBanglaNum(h.year)}`}
+                        subtitle="আজকের দিনের ঘটনা"
+                        fallbackText={h.text}
+                        trigger={
+                          <button className="text-[10px] font-bold text-accent/60 hover:text-accent flex items-center gap-1 transition-colors">
+                            বিস্তারিত জানুন <ChevronRight className="h-2 w-2" />
+                          </button>
+                        }
+                      />
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </Card>
           )}
         </div>

@@ -9,6 +9,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { toBanglaNum } from "@/lib/bangla-calendar";
+import { BengaliWikiDialog } from "@/components/calendar/BengaliWikiDialog";
 
 interface Country {
   countryCode: string;
@@ -172,30 +173,38 @@ const HolidaysPage = () => {
                 <h3 className="mb-2 font-display text-base font-bold text-primary">
                   {BN_MONTHS[m - 1]}
                 </h3>
-                <div className="grid gap-2 md:grid-cols-2">
+                <div className="grid gap-3 md:grid-cols-2">
                   {list.map((h) => (
-                    <Card key={h.date + h.name} className="flex gap-3 p-3 shadow-soft">
-                      <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-secondary text-center">
-                        <div className="text-[10px] uppercase text-muted-foreground">
-                          {BN_MONTHS[Number(h.date.split("-")[1]) - 1].slice(0, 3)}
-                        </div>
-                        <div className="font-display text-lg font-bold leading-none text-accent">
-                          {toBanglaNum(Number(h.date.split("-")[2]))}
-                        </div>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <div className="font-semibold text-foreground">{h.localName}</div>
-                          {h.global && <Badge variant="secondary" className="text-[10px]">জাতীয়</Badge>}
-                        </div>
-                        {h.name !== h.localName && (
-                          <div className="text-xs text-muted-foreground">{h.name}</div>
-                        )}
-                        <div className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
-                          <CalIcon className="h-3 w-3" /> {formatDateBn(h.date)}
-                        </div>
-                      </div>
-                    </Card>
+                    <BengaliWikiDialog
+                      key={h.date + h.name}
+                      query={h.localName || h.name}
+                      title={h.localName || h.name}
+                      subtitle="সরকারি ছুটির দিন"
+                      trigger={
+                        <Card className="flex gap-4 p-4 shadow-soft hover:shadow-warm transition-all cursor-pointer border-primary/5 bg-white/60 backdrop-blur-md group">
+                          <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-gradient-festive text-center shadow-inner ring-2 ring-white/50 group-hover:scale-105 transition-transform">
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-white/70">
+                              {BN_MONTHS[Number(h.date.split("-")[1]) - 1].slice(0, 3)}
+                            </div>
+                            <div className="font-display text-xl font-bold leading-none text-white">
+                              {toBanglaNum(Number(h.date.split("-")[2]))}
+                            </div>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <div className="font-display text-base font-bold text-accent group-hover:text-primary transition-colors">{h.localName}</div>
+                              {h.global && <Badge variant="secondary" className="text-[10px] bg-primary/5 text-primary font-bold">জাতীয়</Badge>}
+                            </div>
+                            {h.name !== h.localName && (
+                              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">{h.name}</div>
+                            )}
+                            <div className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground/70">
+                              <CalIcon className="h-3 w-3" /> {formatDateBn(h.date)}
+                            </div>
+                          </div>
+                        </Card>
+                      }
+                    />
                   ))}
                 </div>
               </div>

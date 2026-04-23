@@ -1,21 +1,14 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Calendar as CalIcon, MapPin, BookOpen, ExternalLink, Loader2, X } from "lucide-react";
+import { Search, Calendar as CalIcon, MapPin, BookOpen } from "lucide-react";
 import { PageShell } from "@/components/calendar/PageShell";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { FREEDOM_FIGHTERS, type FreedomFighter } from "@/data/freedom-fighters";
 import { toBanglaNum } from "@/lib/bangla-calendar";
+import { BengaliWikiDialog } from "@/components/calendar/BengaliWikiDialog";
 
 const BN_MONTHS = [
   "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
@@ -26,13 +19,6 @@ function formatDateBn(iso?: string): string {
   if (!iso) return "—";
   const [y, m, d] = iso.split("-").map(Number);
   return `${toBanglaNum(d)} ${BN_MONTHS[m - 1]} ${toBanglaNum(y)}`;
-}
-
-interface WikiData {
-  extract: string;
-  thumbnail?: string;
-  originalimage?: string;
-  desktop_url: string;
 }
 
 const FreedomFightersPage = () => {
@@ -60,7 +46,7 @@ const FreedomFightersPage = () => {
         <Card className="mb-6 overflow-hidden border-2 border-primary/20 shadow-warm">
           <div className="bg-gradient-festive p-6 text-primary-foreground">
             <div className="text-xs uppercase tracking-wider opacity-90">ভারতের স্বাধীনতা সংগ্রাম</div>
-            <h1 className="mt-1 font-display text-3xl font-bold md:text-4xl">স্বাধীনতা সংগ্রামী</h1>
+            <h1 className="mt-1 font-display text-3xl font-bold md:text-4xl py-1">স্বাধীনতা সংগ্রামী</h1>
             <p className="mt-2 max-w-2xl text-sm opacity-95">
               ভারতের স্বাধীনতার জন্য আত্মত্যাগী মহান ব্যক্তিত্বদের জীবন, সংগ্রাম ও অবদানের বিস্তারিত পরিচয়।
             </p>
@@ -99,47 +85,6 @@ const FreedomFightersPage = () => {
 };
 
 function FighterCard({ f }: { f: FreedomFighter }) {
-  const [open, setOpen] = useState(false);
-  const [hasAttempted, setHasAttempted] = useState(false);
-  const [wiki, setWiki] = useState<WikiData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (open && !hasAttempted && !loading) {
-      const fetchWiki = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-          const response = await fetch(
-            `https://bn.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(f.name.replace(/\s+/g, "_"))}`
-          );
-          
-          if (response.ok) {
-            const data = await response.json();
-            const hasBengali = /[\u0980-\u09FF]/.test(data.extract);
-            
-            if (hasBengali) {
-              setWiki({
-                extract: data.extract,
-                thumbnail: data.thumbnail?.source,
-                originalimage: data.originalimage?.source,
-                desktop_url: data.content_urls.desktop.page
-              });
-            }
-          }
-        } catch (err) {
-          console.error("Wiki fetch error:", err);
-          // We don't set a hard error here because we can fallback to f.description
-        } finally {
-          setLoading(false);
-          setHasAttempted(true);
-        }
-      };
-      fetchWiki();
-    }
-  }, [open, hasAttempted, loading, f.name]);
-
   return (
     <Card className="group relative overflow-hidden p-0 shadow-soft transition-all duration-300 hover:shadow-xl hover:border-primary/30 border-primary/5 bg-white/60 backdrop-blur-md">
       <div className="p-5">
@@ -152,7 +97,7 @@ function FighterCard({ f }: { f: FreedomFighter }) {
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-display text-xl font-bold leading-tight text-accent group-hover:text-primary transition-colors">{f.name}</h3>
+            <h3 className="font-display text-xl font-bold leading-tight text-accent group-hover:text-primary transition-colors py-1">{f.name}</h3>
             <div className="text-xs text-muted-foreground font-medium uppercase tracking-tight">{f.nameEn}</div>
             <div className="mt-1 text-sm font-semibold text-primary/80">{f.role}</div>
           </div>
@@ -194,8 +139,12 @@ function FighterCard({ f }: { f: FreedomFighter }) {
         </div>
 
         <div className="mt-4">
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+          <BengaliWikiDialog 
+            query={f.name}
+            title={f.name}
+            subtitle={f.role}
+            fallbackText={f.description}
+            trigger={
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -204,78 +153,8 @@ function FighterCard({ f }: { f: FreedomFighter }) {
                 <BookOpen className="h-4 w-4" />
                 আরও জানুন (Wikipedia)
               </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl p-0 overflow-hidden bg-white/95 backdrop-blur-2xl border-none shadow-2xl max-h-[85vh] flex flex-col">
-              <div className="flex h-full flex-col">
-                {/* Information Area */}
-                <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-                  {/* Header with Title */}
-                  <div className="p-6 md:p-8 pb-0 border-b border-primary/5">
-                    <DialogHeader className="text-left space-y-3 pt-2">
-                      <DialogTitle className="text-3xl md:text-4xl font-bold text-primary leading-[1.3] py-1">
-                        {f.name}
-                      </DialogTitle>
-                      <div className="flex items-center gap-3">
-                        <div className="h-1 w-12 bg-primary/20 rounded-full shrink-0" />
-                        <p className="text-sm md:text-base font-semibold text-accent leading-tight">
-                          {f.role}
-                        </p>
-                      </div>
-                    </DialogHeader>
-                  </div>
-
-                  {/* Content Area */}
-                  <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 pt-6">
-                    {loading ? (
-                      <div className="flex flex-col items-center justify-center h-48 gap-3">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary/60" />
-                        <p className="text-xs text-muted-foreground font-medium animate-pulse">লোড হচ্ছে...</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-6">
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-[10px] font-bold text-primary/60 uppercase tracking-widest">
-                            <BookOpen className="h-3.5 w-3.5" />
-                            সংক্ষিপ্ত জীবনী (বাংলা)
-                          </div>
-                          <p className="text-sm md:text-base leading-relaxed text-foreground/80 font-medium italic text-justify md:text-left">
-                            {wiki?.extract || f.description}
-                          </p>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 border-t border-primary/5 pt-6">
-                          <div className="space-y-1">
-                            <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold opacity-60">জন্ম</div>
-                            <div className="text-xs font-bold text-accent">{formatDateBn(f.birth)}</div>
-                          </div>
-                          {f.death && (
-                            <div className="space-y-1">
-                              <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold opacity-60">প্রয়াণ</div>
-                              <div className="text-xs font-bold text-accent">{formatDateBn(f.death)}</div>
-                            </div>
-                          )}
-                        </div>
-
-                        {wiki?.desktop_url && (
-                          <div className="pt-4 pb-2">
-                            <a 
-                              href={wiki.desktop_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="group flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-accent text-white text-sm font-bold hover:bg-accent/90 transition-all shadow-lg shadow-accent/10"
-                            >
-                              বিস্তারিত পড়ুন
-                              <ExternalLink className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+            }
+          />
         </div>
       </div>
     </Card>
