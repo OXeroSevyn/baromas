@@ -14,6 +14,13 @@ import { recipeForRitu } from "@/data/recipes";
 import { Card } from "@/components/ui/card";
 import { eventsOnDate } from "@/data/historical-events";
 import { PanjikaCard } from "@/components/calendar/PanjikaCard";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 // Helper components moved to top for absolute safety
 function QuickLink({ to, label, emoji, image }: { to: string; label: string; emoji: string; image?: string }) {
@@ -58,6 +65,15 @@ const Index = () => {
     const t = new Date();
     return { y: t.getFullYear(), m: t.getMonth() };
   });
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem("has_seen_welcome");
+    if (!hasSeenWelcome) {
+      setShowWelcome(true);
+      localStorage.setItem("has_seen_welcome", "true");
+    }
+  }, []);
 
   // Safe variables with fallbacks
   const today = new Date();
@@ -210,6 +226,40 @@ const Index = () => {
           <FeatureCard title="শুভক্ষণ" desc="প্রতিদিনের অমৃতযোগ ও মাহেন্দ্রযোগ" icon="✨" image="/branding/icons/star.png" />
         </div>
       </section>
+
+      <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
+        <DialogContent className="max-w-md rounded-3xl border-orange-100 shadow-2xl p-0 overflow-hidden bg-gradient-cream">
+          <div className="h-24 bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center relative">
+            <div className="absolute -bottom-10 bg-white p-2 rounded-2xl shadow-lg border border-orange-100 h-20 w-20 flex items-center justify-center">
+              <img src="/branding/logo-color.png" alt="Logo" className="h-full object-contain" />
+            </div>
+          </div>
+          
+          <div className="px-8 pb-8 pt-12 text-center">
+            <DialogHeader>
+              <DialogTitle className="font-display text-2xl font-bold text-accent mb-4">স্বাগতম বারোমাসে</DialogTitle>
+              <DialogDescription className="sr-only">বাংলার সময়, সংস্কৃতি আর উৎসবের ডিজিটাল ঠিকানায় আপনাকে স্বাগতম।</DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 text-accent/80 text-sm leading-relaxed text-justify">
+              <p className="font-bold text-center text-primary italic">"বাংলার সময়, সংস্কৃতি আর উৎসবের ডিজিটাল ঠিকানায়"</p>
+              <p>এখানে প্রতিটি দিন শুধু তারিখ নয়, একেকটি গল্প। পঞ্জিকা, তিথি, রাশি, শুভ মুহূর্ত আর বাঙালিয়ানার স্পন্দন—সব একসাথে, এক ছাদের নিচে।</p>
+              <p>বারো মাস, তেরো পার্বণ — আর আপনার প্রতিদিনের সঙ্গী আমরা। 🌿 আজকের দিনটা শুরু হোক শুভ আলোয়।</p>
+              <div className="pt-4 border-t border-orange-100">
+                <p className="text-xs text-muted-foreground italic">"ভুল ত্রুটি মার্জনা করে আমাকে অ্যাপটি ভালোভাবে build করতে সাহায্য করুন।"</p>
+                <p className="text-sm font-bold text-accent mt-2">ইতি, শুভম দে</p>
+              </div>
+            </div>
+            
+            <button 
+              onClick={() => setShowWelcome(false)}
+              className="mt-8 w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all active:scale-95"
+            >
+              শুরু করুন
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PageShell>
   );
 };
