@@ -14,7 +14,7 @@ import {
   type Region,
   type CityName,
 } from "@/lib/bangla-calendar";
-import { AlertTriangle, Heart, Moon, Sparkles } from "lucide-react";
+import { AlertTriangle, Heart, Moon, Sparkles, Calendar, ChevronRight } from "lucide-react";
 
 export function PanjikaCard({ region, city }: { region: Region; city: CityName }) {
   const today = new Date();
@@ -34,112 +34,113 @@ export function PanjikaCard({ region, city }: { region: Region; city: CityName }
   const kalbela = periods.find((p) => p.name === "কালবেলা");
   const rahu = periods.find((p) => p.name === "রাহু কাল");
 
-  if (!kalbela || !rahu) return null; // Safe exit if math fails
+  if (!kalbela || !rahu) return null;
 
   const tithiColor: Record<string, string> = {
     একাদশী: "bg-primary/10 text-primary",
-    পূর্ণিমা: "bg-gold/20 text-foreground",
+    পূর্ণিমা: "bg-amber-500/10 text-amber-600",
     অমাবস্যা: "bg-accent/10 text-accent",
   };
 
   return (
-    <Card className="overflow-hidden border-2 border-primary/20 p-0 shadow-soft">
-      <div className="bg-gradient-festive px-4 py-3 text-primary-foreground">
+    <Card className="relative overflow-hidden border-none shadow-xl rounded-[40px] bg-card/40 backdrop-blur-md group">
+      <div className="bg-gradient-to-r from-accent to-accent/80 p-6 text-white relative">
         <div className="flex items-center justify-between">
-          <div className="font-display text-lg font-bold">পঞ্জিকা</div>
+          <div className="flex items-center gap-3">
+             <Calendar className="h-5 w-5 opacity-70" />
+             <div className="font-display text-xl font-black tracking-tight py-1">পঞ্জিকা</div>
+          </div>
           <Link
             to="/panjika"
-            className="rounded-md bg-background/15 px-2.5 py-1 text-xs font-semibold hover:bg-background/25"
+            className="flex items-center gap-1.5 px-4 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-[10px] font-black uppercase tracking-widest transition-all"
           >
-            বিস্তারিত →
+            বিস্তারিত <ChevronRight className="h-3 w-3" />
           </Link>
         </div>
-        <div className="text-xs opacity-90">তিথি · লগ্ন · কালবেলা</div>
+        <div className="text-[10px] font-bold opacity-60 uppercase tracking-widest mt-1">তিথি · লগ্ন · কালবেলা</div>
       </div>
 
-      <div className="space-y-4 p-4">
-        {/* Today's Auspicious Times */}
-        <div>
-          <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-green-600">
-            <Sparkles className="h-3.5 w-3.5" /> আজকের শুভ সময়
+      <div className="space-y-8 p-8">
+        {/* Shubho Moments */}
+        <section>
+          <div className="mb-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">
+            <Sparkles className="h-4 w-4" /> শুভ সময়
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-3">
             {shubho.map((s, i) => (
-              <div key={i} className="rounded-md border border-green-200 bg-green-50 p-2">
-                <div className="text-[10px] text-green-700 font-bold uppercase">{s.name}</div>
-                <div className="text-sm font-bold text-green-800">
+              <div key={i} className="rounded-[24px] bg-emerald-500/5 border border-emerald-500/10 p-4 transition-transform hover:scale-105">
+                <div className="text-[9px] text-emerald-600 font-black uppercase tracking-widest mb-1">{s.name}</div>
+                <div className="text-sm font-black text-accent">
                   {formatTimeBangla(s.start, tz)} – {formatTimeBangla(s.end, tz)}
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* Today's Kalbela */}
-        <div>
-          <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-destructive">
-            <AlertTriangle className="h-3.5 w-3.5" /> আজকের অশুভ সময়
+        {/* Ashubho Moments */}
+        <section>
+          <div className="mb-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-rose-500">
+            <AlertTriangle className="h-4 w-4" /> অশুভ সময়
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="rounded-md border border-destructive/20 bg-destructive/5 p-2">
-              <div className="text-xs text-muted-foreground">কালবেলা</div>
-              <div className="text-sm font-semibold">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-[24px] bg-rose-500/5 border border-rose-500/10 p-4 transition-transform hover:scale-105">
+              <div className="text-[9px] text-rose-600 font-black uppercase tracking-widest mb-1">কালবেলা</div>
+              <div className="text-sm font-black text-accent">
                 {formatTimeBangla(kalbela.start, tz)} – {formatTimeBangla(kalbela.end, tz)}
               </div>
             </div>
-            <div className="rounded-md border border-destructive/20 bg-destructive/5 p-2">
-              <div className="text-xs text-muted-foreground">রাহু কাল</div>
-              <div className="text-sm font-semibold">
+            <div className="rounded-[24px] bg-rose-500/5 border border-rose-500/10 p-4 transition-transform hover:scale-105">
+              <div className="text-[9px] text-rose-600 font-black uppercase tracking-widest mb-1">রাহু কাল</div>
+              <div className="text-sm font-black text-accent">
                 {formatTimeBangla(rahu.start, tz)} – {formatTimeBangla(rahu.end, tz)}
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Upcoming tithis */}
-        <div>
-          <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
-            <Moon className="h-3.5 w-3.5" /> আসন্ন একাদশী · পূর্ণিমা · অমাবস্যা
+        {/* Upcoming Tithis */}
+        <section>
+          <div className="mb-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+            <Moon className="h-4 w-4" /> আসন্ন তিথি
           </div>
-          <ul className="space-y-1.5">
+          <div className="space-y-2">
             {upcomingTithis.map((t, i) => (
-              <li key={i} className="flex items-center justify-between gap-2 text-sm">
-                <span>
+              <div key={i} className="flex items-center justify-between p-4 rounded-[20px] bg-primary/5 border border-primary/5 hover:bg-primary/10 transition-colors">
+                <div className="font-bold text-accent text-sm">
                   {toBanglaNum(t.date.getDate())} {GREGORIAN_MONTHS_BN[t.date.getMonth()]}
-                  {t.name && (
-                    <span className="ml-1 text-xs text-muted-foreground">({t.name})</span>
-                  )}
-                </span>
-                <Badge variant="secondary" className={tithiColor[t.type]}>
+                  {t.name && <span className="ml-2 text-[10px] text-muted-foreground font-medium opacity-60">({t.name})</span>}
+                </div>
+                <Badge className={`${tithiColor[t.type] || 'bg-primary/10 text-primary'} border-none font-black text-[9px] uppercase tracking-widest px-2 py-0.5`}>
                   {t.type}
                 </Badge>
-              </li>
+              </div>
             ))}
-          </ul>
-        </div>
+          </div>
+        </section>
 
-        {/* Upcoming weddings */}
+        {/* Weddings */}
         {upcomingWeddings.length > 0 && (
-          <div>
-            <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-festive">
-              <Heart className="h-3.5 w-3.5" /> আসন্ন বিবাহ শুভ দিন
+          <section>
+            <div className="mb-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-festive">
+              <Heart className="h-4 w-4" /> শুভ বিবাহ
             </div>
-            <ul className="space-y-1.5">
+            <div className="space-y-3">
               {upcomingWeddings.map((w, i) => (
-                <li key={i} className="text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold">
+                <div key={i} className="p-4 rounded-[24px] bg-festive/5 border border-festive/10 hover:bg-festive/10 transition-all group/wedding">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-black text-accent">
                       {toBanglaNum(w.date.getDate())} {GREGORIAN_MONTHS_BN[w.date.getMonth()]}
                     </span>
-                    <span className="text-xs text-muted-foreground">{w.weekday}</span>
+                    <span className="text-[10px] font-black text-festive uppercase tracking-widest">{w.weekday}</span>
                   </div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-[10px] font-bold text-muted-foreground opacity-60">
                     {w.nakshatra} · {w.tithi} · {w.banglaMonth}
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
-          </div>
+            </div>
+          </section>
         )}
       </div>
     </Card>
