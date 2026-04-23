@@ -5,7 +5,7 @@ import {
   TrendingUp, TrendingDown, Fuel, Coins, Calendar, 
   RefreshCcw, Info, ArrowUpRight, ArrowDownRight,
   BarChart3, Globe, Zap, ArrowRight, TrendingUp as TrendUpIcon, 
-  Target, Sparkles, MapPin, ExternalLink
+  Target, Sparkles, MapPin, ExternalLink, Newspaper
 } from "lucide-react";
 import { toBanglaNum } from "@/lib/bangla-calendar";
 import { useEffect, useState } from "react";
