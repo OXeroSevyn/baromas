@@ -186,64 +186,51 @@ const Mantras = () => {
           </div>
         )}
 
-        {/* Specialized Print Template (Visible only on Print) */}
+        {/* Specialized Print Template (Very Simple & Clean) */}
         {selectedMantra && (
-          <div id="print-mantra" className="hidden print:block bg-white text-black min-h-screen">
-             <div className="p-8 md:p-12 flex flex-col min-h-screen border-[12px] border-double border-primary/10">
-                {/* Branding Header */}
-                <div className="flex items-center justify-between mb-10 pb-6 border-b border-primary/20">
-                   <div className="flex items-center gap-4">
-                      <img src="/branding/logo-color.png" alt="Logo" className="h-12 w-12" />
-                      <div className="flex flex-col">
-                         <h1 className="text-2xl font-bold text-primary leading-tight">বারোমাস</h1>
-                         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">বাংলার সময় ও সংস্কৃতি</p>
+          <div id="print-mantra" className="hidden print:block bg-white text-black">
+             <div className="p-10 max-w-3xl mx-auto">
+                {/* Minimal Header */}
+                <div className="flex justify-between items-center mb-12 border-b-2 border-black/10 pb-6">
+                   <div className="flex items-center gap-3">
+                      <img src="/branding/logo-color.png" alt="Logo" className="h-10 w-10" />
+                      <div>
+                        <h1 className="text-xl font-bold text-black">বারোমাস</h1>
+                        <p className="text-[8px] uppercase tracking-wider text-muted-foreground">Devotional Collection</p>
                       </div>
                    </div>
-                   <div className="text-right flex flex-col justify-end">
-                      <div className="text-sm font-bold text-accent">{toBanglaNum(new Date().toLocaleDateString('bn-BD'))}</div>
-                      <div className="text-[9px] uppercase tracking-widest text-primary/50 font-bold">Devotional Series</div>
+                   <div className="text-right">
+                      <div className="text-sm font-bold">{toBanglaNum(new Date().toLocaleDateString('bn-BD'))}</div>
+                      <div className="text-[8px] text-muted-foreground">© baromas.app</div>
                    </div>
                 </div>
 
                 {/* Content Section */}
-                <div className="flex-1 flex flex-col">
-                   <div className="text-center mb-10">
-                      <div className="inline-block px-4 py-1 bg-primary/5 rounded-full text-[10px] font-bold text-primary uppercase mb-3">
-                         {selectedMantra.type === "mantra" ? "প্রণাম মন্ত্র" : "ব্রতকথা ও পাঁচালী"}
-                      </div>
-                      <h2 className="text-3xl font-bold text-accent leading-tight">{selectedMantra.name}</h2>
-                      <div className="w-16 h-0.5 bg-primary/20 mx-auto mt-4" />
-                   </div>
-
-                   <div className="max-w-2xl mx-auto w-full px-6">
-                    <div className={cn(
-                       "text-xl md:text-2xl leading-[1.8] whitespace-pre-wrap font-serif text-accent/90 break-words",
-                       selectedMantra.type === "panchali" ? "text-left" : "text-center"
-                    )}>
-                       {selectedMantra.content}
-                    </div>
-                      
-                      {selectedMantra.description && (
-                        <div className="mt-12 p-6 bg-secondary/10 rounded-2xl border-l-4 border-primary/40 break-inside-avoid">
-                           <h4 className="font-bold text-accent text-sm mb-2">মাহাত্ম্য ও নিয়ম:</h4>
-                           <p className="text-xs text-muted-foreground leading-relaxed italic">
-                              {selectedMantra.description}
-                           </p>
-                        </div>
-                      )}
-                   </div>
+                <div className="mb-10 text-center">
+                   <h2 className="text-3xl font-bold mb-4">{selectedMantra.name}</h2>
+                   <p className="text-xs text-muted-foreground font-bold italic">{selectedMantra.god} প্রণাম / পূজা</p>
                 </div>
 
-                {/* Footer Section */}
-                <div className="mt-12 pt-6 border-t border-primary/10 flex justify-between items-end text-[9px] text-muted-foreground/60">
-                   <div className="flex flex-col gap-1">
-                      <p>© ২০২৬ বারোমাস - সর্বস্বত্ব সংরক্ষিত।</p>
-                      <p className="font-bold text-primary/40 italic">ডাউনলোড করুন: baromas.app</p>
-                   </div>
-                   <div className="flex flex-col items-end">
-                      <img src="/branding/logo-color.png" alt="Logo" className="h-10 w-10 opacity-10 grayscale mb-2" />
-                      <span className="italic tracking-widest uppercase text-[8px]">Sanatan Dharma - Heritage</span>
-                   </div>
+                <div className={cn(
+                  "text-xl leading-[1.8] whitespace-pre-wrap font-serif text-black/90",
+                  selectedMantra.type === "panchali" ? "text-left" : "text-center"
+                )}>
+                  {selectedMantra.content}
+                </div>
+
+                {selectedMantra.description && (
+                  <div className="mt-12 pt-8 border-t border-black/5 italic text-sm text-muted-foreground">
+                    <h4 className="font-bold text-black not-italic mb-2">মাহাত্ম্য ও নিয়ম:</h4>
+                    {selectedMantra.description}
+                  </div>
+                )}
+
+                {/* Simple Footer */}
+                <div className="mt-20 text-center border-t border-black/10 pt-6">
+                   <p className="text-[10px] text-muted-foreground">
+                     "বাংলার সময়, সংস্কৃতি আর উৎসবের ডিজিটাল ঠিকানা"
+                   </p>
+                   <p className="text-[9px] font-bold mt-1">www.baromas.app</p>
                 </div>
              </div>
           </div>
