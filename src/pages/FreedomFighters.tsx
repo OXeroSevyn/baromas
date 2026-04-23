@@ -211,98 +211,92 @@ function FighterCard({ f }: { f: FreedomFighter }) {
                 আরও জানুন (Wikipedia)
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl w-[95vw] rounded-[2rem] overflow-hidden border-none p-0 bg-white/95 backdrop-blur-2xl shadow-2xl">
-              <div className="flex flex-col md:flex-row min-h-[450px]">
-                {/* Left Side: Image */}
-                <div className="relative w-full md:w-[40%] h-48 md:h-auto bg-gradient-festive overflow-hidden">
+            <DialogContent className="max-w-3xl w-[90vw] h-[500px] md:h-[450px] rounded-[2rem] overflow-hidden border-none p-0 bg-white/95 backdrop-blur-2xl shadow-2xl flex flex-col md:flex-row">
+                {/* Left Side: Image Panel */}
+                <div className="relative w-full md:w-[35%] h-40 md:h-full bg-gradient-festive shrink-0 overflow-hidden">
                    {(wiki?.originalimage || wiki?.thumbnail) ? (
                     <img 
                       src={wiki.originalimage || wiki.thumbnail} 
                       alt={f.name} 
-                      className="h-full w-full object-cover opacity-90 transition-transform duration-700 hover:scale-105"
+                      className="h-full w-full object-cover opacity-90"
                     />
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full gap-4 p-8">
-                      <span className="text-8xl opacity-20 drop-shadow-lg">{f.emoji ?? "🇮🇳"}</span>
-                      <p className="text-white/40 text-xs font-bold uppercase tracking-widest text-center">চিত্র উপলব্ধ নেই</p>
+                    <div className="flex flex-col items-center justify-center h-full gap-3 p-6 text-white/30">
+                      <span className="text-7xl drop-shadow-lg">{f.emoji ?? "🇮🇳"}</span>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-center">চিত্র নেই</p>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-black/20" />
-                  
-                  <div className="absolute bottom-6 left-6 right-6 text-white md:hidden">
-                    <h2 className="text-2xl font-display font-bold">{f.name}</h2>
-                    <p className="text-xs opacity-80 uppercase tracking-widest">{f.nameEn}</p>
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-black/10" />
                 </div>
 
-                {/* Vertical Divider (Desktop Only) */}
-                <div className="hidden md:block w-[1px] bg-primary/10 self-stretch" />
+                {/* Vertical Divider */}
+                <div className="hidden md:block w-[1px] bg-primary/5 self-stretch" />
 
-                {/* Right Side: Details */}
-                <div className="flex-1 flex flex-col p-6 md:p-10 bg-white/50">
-                  <div className="hidden md:block mb-8">
-                    <div className="flex items-center justify-between">
-                       <Badge variant="secondary" className="bg-primary/5 text-primary border-none text-[10px] uppercase tracking-widest px-3 py-1">ব্যক্তিত্ব প্রোফাইল</Badge>
-                       <Button variant="ghost" size="icon" onClick={() => setOpen(false)} className="rounded-full hover:bg-primary/5">
-                        <X className="h-4 w-4" />
-                       </Button>
+                {/* Right Side: Information Panel */}
+                <div className="flex-1 flex flex-col min-w-0 bg-white/40">
+                  {/* Header */}
+                  <div className="p-6 md:p-8 pb-4 border-b border-primary/5">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <h2 className="text-2xl md:text-3xl font-display font-bold text-accent truncate">{f.name}</h2>
+                        <div className="mt-1 flex items-center gap-2">
+                          <span className="h-1 w-8 bg-primary/30 rounded-full" />
+                          <p className="text-xs text-primary font-bold uppercase tracking-wider">{f.role}</p>
+                        </div>
+                      </div>
+                      {/* Note: Shadcn Dialog includes a default close button, so we don't need a manual one here unless we hide the default one */}
                     </div>
-                    <h2 className="mt-4 text-4xl font-display font-bold text-accent">{f.name}</h2>
-                    <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest">{f.nameEn}</p>
-                    <div className="mt-2 text-primary font-bold">{f.role}</div>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+                  {/* Content - Scrollable */}
+                  <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 pt-4">
                     {loading ? (
-                      <div className="flex flex-col items-center justify-center py-12 gap-3">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="text-sm text-muted-foreground font-medium">উইকিপিডিয়া থেকে তথ্য আসছে...</p>
+                      <div className="flex flex-col items-center justify-center h-full gap-3 py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary/60" />
+                        <p className="text-xs text-muted-foreground font-medium animate-pulse">লোড হচ্ছে...</p>
                       </div>
-                    ) : error ? (
-                      <div className="p-6 text-center bg-destructive/5 rounded-2xl border border-destructive/10">
-                        <p className="text-sm text-destructive font-medium">{error}</p>
-                      </div>
-                    ) : wiki ? (
+                    ) : (
                       <div className="space-y-6">
                         <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-primary font-bold text-[10px] uppercase tracking-widest">
-                            <BookOpen className="h-3 w-3" />
-                            সংক্ষিপ্ত জীবনী
+                          <div className="flex items-center gap-2 text-[10px] font-bold text-primary/60 uppercase tracking-widest">
+                            <BookOpen className="h-3.5 w-3.5" />
+                            সংক্ষিপ্ত জীবনী (বাংলা)
                           </div>
-                          <p className="text-base leading-relaxed text-foreground/80 font-medium italic">
-                            "{wiki.extract}"
+                          <p className="text-sm md:text-base leading-relaxed text-foreground/80 font-medium italic text-justify md:text-left">
+                            {wiki?.extract || f.description}
                           </p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-6 border-t border-primary/5 pt-6">
+                        <div className="grid grid-cols-2 gap-4 border-t border-primary/5 pt-6">
                           <div className="space-y-1">
-                            <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">জন্ম তারিখ</div>
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold opacity-60">জন্ম</div>
                             <div className="text-xs font-bold text-accent">{formatDateBn(f.birth)}</div>
                           </div>
                           {f.death && (
                             <div className="space-y-1">
-                              <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">প্রয়াণ তারিখ</div>
+                              <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold opacity-60">প্রয়াণ</div>
                               <div className="text-xs font-bold text-accent">{formatDateBn(f.death)}</div>
                             </div>
                           )}
                         </div>
 
-                        <div className="pt-6">
-                          <a 
-                            href={wiki.desktop_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="group flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-accent text-white font-bold hover:bg-accent/90 transition-all shadow-lg shadow-accent/20"
-                          >
-                            বিস্তারিত পড়ুন
-                            <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                          </a>
-                        </div>
+                        {wiki?.desktop_url && (
+                          <div className="pt-4 pb-2">
+                            <a 
+                              href={wiki.desktop_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="group flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-accent text-white text-sm font-bold hover:bg-accent/90 transition-all shadow-lg shadow-accent/10"
+                            >
+                              বিস্তারিত পড়ুন
+                              <ExternalLink className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                            </a>
+                          </div>
+                        )}
                       </div>
-                    ) : null}
+                    )}
                   </div>
                 </div>
-              </div>
             </DialogContent>
           </Dialog>
         </div>
