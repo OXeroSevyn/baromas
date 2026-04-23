@@ -1,14 +1,21 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, Calendar as CalIcon, MapPin, ChevronDown, ChevronUp, BookOpen, ExternalLink, Loader2 } from "lucide-react";
+import { Search, Calendar as CalIcon, MapPin, BookOpen, ExternalLink, Loader2, X } from "lucide-react";
 import { PageShell } from "@/components/calendar/PageShell";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { FREEDOM_FIGHTERS, type FreedomFighter } from "@/data/freedom-fighters";
 import { toBanglaNum } from "@/lib/bangla-calendar";
-import { motion, AnimatePresence } from "framer-motion";
 
 const BN_MONTHS = [
   "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
@@ -30,7 +37,6 @@ interface WikiData {
 
 const FreedomFightersPage = () => {
   const [q, setQ] = useState("");
-  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const list = useMemo(() => {
     const t = q.trim().toLowerCase();
@@ -78,12 +84,7 @@ const FreedomFightersPage = () => {
 
         <div className="grid gap-6 md:grid-cols-2 items-start">
           {list.map((f) => (
-            <FighterCard 
-              key={f.id} 
-              f={f} 
-              isExpanded={expandedId === f.id}
-              onToggle={() => setExpandedId(expandedId === f.id ? null : f.id)}
-            />
+            <FighterCard key={f.id} f={f} />
           ))}
         </div>
 
@@ -97,21 +98,14 @@ const FreedomFightersPage = () => {
   );
 };
 
-function FighterCard({ 
-  f, 
-  isExpanded, 
-  onToggle 
-}: { 
-  f: FreedomFighter; 
-  isExpanded: boolean; 
-  onToggle: () => void;
-}) {
+function FighterCard({ f }: { f: FreedomFighter }) {
+  const [open, setOpen] = useState(false);
   const [wiki, setWiki] = useState<WikiData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isExpanded && !wiki && !loading) {
+    if (open && !wiki && !loading) {
       const fetchWiki = async () => {
         setLoading(true);
         setError(null);
@@ -150,7 +144,7 @@ function FighterCard({
       };
       fetchWiki();
     }
-  }, [isExpanded, wiki, loading, f.name, f.nameEn]);
+  }, [open, wiki, loading, f.name, f.nameEn]);
 
   return (
     <Card className="group relative overflow-hidden p-0 shadow-soft transition-all duration-300 hover:shadow-xl hover:border-primary/30 border-primary/5 bg-white/60 backdrop-blur-md">
@@ -206,60 +200,94 @@ function FighterCard({
         </div>
 
         <div className="mt-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onToggle}
-            className="w-full h-9 justify-between text-primary font-bold bg-primary/5 hover:bg-primary/10 rounded-xl"
-          >
-            <div className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              আরও জানুন (Wikipedia)
-            </div>
-            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-full h-10 justify-center gap-2 text-primary font-bold bg-primary/5 hover:bg-primary/10 rounded-xl"
+              >
+                <BookOpen className="h-4 w-4" />
+                আরও জানুন (Wikipedia)
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl w-[95vw] rounded-3xl overflow-hidden border-none p-0 bg-white/95 backdrop-blur-xl shadow-2xl">
+              <div className="relative overflow-hidden h-48 sm:h-64 bg-gradient-festive">
+                {(wiki?.originalimage || wiki?.thumbnail) ? (
+                  <img 
+                    src={wiki.originalimage || wiki.thumbnail} 
+                    alt={f.name} 
+                    className="h-full w-full object-cover opacity-90"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <span className="text-8xl opacity-20">{f.emoji ?? "🇮🇳"}</span>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6 text-white">
+                  <h2 className="text-3xl font-display font-bold">{f.name}</h2>
+                  <p className="text-sm opacity-90 font-medium uppercase tracking-wider">{f.nameEn}</p>
+                </div>
+              </div>
+              
+              <div className="p-6 sm:p-8 max-h-[60vh] overflow-y-auto custom-scrollbar">
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-3">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground font-medium animate-pulse">উইকিপিডিয়া থেকে তথ্য আসছে...</p>
+                  </div>
+                ) : error ? (
+                  <div className="p-4 text-center text-sm text-destructive bg-destructive/5 rounded-2xl border border-destructive/10">
+                    {error}
+                  </div>
+                ) : wiki ? (
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 text-primary font-bold text-sm">
+                        <BookOpen className="h-4 w-4" />
+                        সংক্ষিপ্ত জীবনী
+                      </div>
+                      <p className="text-base leading-relaxed text-foreground/90 font-medium whitespace-pre-wrap">
+                        {wiki.extract}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-6 border-t border-primary/10 pt-6">
+                      <div className="space-y-1">
+                        <div className="text-xs text-muted-foreground uppercase tracking-wider">ভূমিকা</div>
+                        <div className="text-sm font-bold text-accent">{f.role}</div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-xs text-muted-foreground uppercase tracking-wider">জন্ম</div>
+                        <div className="text-sm font-bold text-accent">{formatDateBn(f.birth)}</div>
+                      </div>
+                      {f.death && (
+                        <div className="space-y-1">
+                          <div className="text-xs text-muted-foreground uppercase tracking-wider">প্রয়াণ</div>
+                          <div className="text-sm font-bold text-accent">{formatDateBn(f.death)}</div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-4">
+                      <a 
+                        href={wiki.desktop_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-primary text-white font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                      >
+                        উইকিপিডিয়াতে বিস্তারিত পড়ুন
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
-
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="bg-primary/5 border-t border-primary/10"
-          >
-            <div className="p-5">
-              {loading ? (
-                <div className="flex flex-col items-center justify-center py-6 gap-3">
-                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                  <p className="text-xs text-muted-foreground animate-pulse">উইকিপিডিয়া থেকে তথ্য আসছে...</p>
-                </div>
-              ) : error ? (
-                <div className="p-3 text-center text-xs text-destructive bg-destructive/5 rounded-lg border border-destructive/10">
-                  {error}
-                </div>
-              ) : wiki ? (
-                  <div className="space-y-3">
-                    <p className="text-sm leading-relaxed text-foreground/90 font-medium">
-                      {wiki.extract}
-                    </p>
-                    <a 
-                      href={wiki.desktop_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline"
-                    >
-                      উইকিপিডিয়াতে বিস্তারিত পড়ুন
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-              ) : null}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </Card>
   );
 }
