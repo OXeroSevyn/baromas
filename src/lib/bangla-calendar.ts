@@ -45,12 +45,12 @@ export const BANGLA_MONTH_MEANINGS: Record<string, string> = {
 };
 
 export const RITUS = [
-  { name: "গ্রীষ্ম", months: ["বৈশাখ", "জ্যৈষ্ঠ"], emoji: "☀️", image: "/branding/ritus/grishma.png" },
-  { name: "বর্ষা", months: ["আষাঢ়", "শ্রাবণ"], emoji: "🌧️", image: "/branding/ritus/barsha.png" },
-  { name: "শরৎ", months: ["ভাদ্র", "আশ্বিন"], emoji: "🍂", image: "/branding/ritus/sharat.png" },
-  { name: "হেমন্ত", months: ["কার্তিক", "অগ্রহায়ণ"], emoji: "🌾", image: "/branding/ritus/hemanta.png" },
-  { name: "শীত", months: ["পৌষ", "মাঘ"], emoji: "❄️", image: "/branding/ritus/sheet.png" },
-  { name: "বসন্ত", months: ["ফাল্গুন", "চৈত্র"], emoji: "🌸", image: "/branding/ritus/basanta.png" },
+  { name: "গ্রীষ্ম", months: ["বৈশাখ", "জ্যৈষ্ঠ"], emoji: "☀️", iconifyName: "fluent-emoji:sun" },
+  { name: "বর্ষা", months: ["আষাঢ়", "শ্রাবণ"], emoji: "🌧️", iconifyName: "fluent-emoji:cloud-with-rain" },
+  { name: "শরৎ", months: ["ভাদ্র", "আশ্বিন"], emoji: "🍂", iconifyName: "fluent-emoji:fallen-leaf" },
+  { name: "হেমন্ত", months: ["কার্তিক", "অগ্রহায়ণ"], emoji: "🌾", iconifyName: "fluent-emoji:sheaf-of-rice" },
+  { name: "শীত", months: ["পৌষ", "মাঘ"], emoji: "❄️", iconifyName: "fluent-emoji:snowflake" },
+  { name: "বসন্ত", months: ["ফাল্গুন", "চৈত্র"], emoji: "🌸", iconifyName: "fluent-emoji:cherry-blossom" },
 ] as const;
 
 export const BANGLA_WEEKDAYS = [
@@ -129,7 +129,10 @@ export interface BanglaDate {
   weekdayName: string;
   ritu: string;
   rituEmoji: string;
-  rituImage: string;
+  weekdayName: string;
+  ritu: string;
+  rituEmoji: string;
+  rituIcon: string;
 }
 
 function dayDiff(a: Date, b: Date): number {
@@ -169,7 +172,7 @@ export function gregorianToBangla(g: Date, region: Region = "WB"): BanglaDate {
     weekdayName: BANGLA_WEEKDAYS[g.getDay()],
     ritu: ritu.name,
     rituEmoji: ritu.emoji,
-    rituImage: ritu.image,
+    rituIcon: ritu.iconifyName,
   };
 }
 

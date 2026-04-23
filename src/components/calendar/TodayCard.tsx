@@ -51,8 +51,12 @@ export function TodayCard({ region, city }: { region: Region; city: CityName }) 
           </div>
           <div className="text-right">
             <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg bg-white/20 shadow-soft ml-auto mb-1">
-              {bn.rituImage ? (
-                <img src={bn.rituImage} alt={bn.ritu} className="h-full w-full object-contain p-1" />
+              {bn.rituIcon ? (
+                <img 
+                  src={`https://api.iconify.design/${bn.rituIcon.replace(':', '/')}.svg?color=white`} 
+                  alt={bn.ritu} 
+                  className="h-full w-full object-contain p-2" 
+                />
               ) : (
                 <span className="text-3xl">{bn.rituEmoji}</span>
               )}
