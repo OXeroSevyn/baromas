@@ -229,16 +229,6 @@ function FighterCard({ f }: { f: FreedomFighter }) {
                   {error}
                 </div>
               ) : wiki ? (
-                <div className="space-y-4">
-                  {(wiki.originalimage || wiki.thumbnail) && (
-                    <div className="relative aspect-video w-full overflow-hidden rounded-xl border-2 border-white/80 shadow-md">
-                      <img 
-                        src={wiki.originalimage || wiki.thumbnail} 
-                        alt={f.name} 
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  )}
                   <div className="space-y-3">
                     <p className="text-sm leading-relaxed text-foreground/90 font-medium">
                       {wiki.extract}
@@ -253,7 +243,6 @@ function FighterCard({ f }: { f: FreedomFighter }) {
                       <ExternalLink className="h-3 w-3" />
                     </a>
                   </div>
-                </div>
               ) : null}
             </div>
           </motion.div>
