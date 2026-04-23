@@ -4,9 +4,8 @@ import { isoDate, toBanglaNum, GREGORIAN_MONTHS_BN, gregorianToBangla } from "@/
 import type { Festival } from "@/data/festivals";
 import type { Region } from "@/lib/bangla-calendar";
 import { BengaliWikiDialog } from "./BengaliWikiDialog";
-import { BookOpen, Calendar, Sparkles } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 export function FestivalCard({
   festival,
@@ -19,49 +18,39 @@ export function FestivalCard({
 }) {
   const bn = gregorianToBangla(date, region);
   return (
-    <Card className="group relative h-full overflow-hidden rounded-[40px] border border-primary/5 bg-card/40 backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10">
+    <Card className="group relative h-full overflow-hidden p-0 transition-all hover:-translate-y-1 hover:shadow-warm border-primary/5 bg-white/60 backdrop-blur-md">
       <Link to={`/day/${isoDate(date)}`} className="block">
-        <div className="p-8 space-y-6">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-primary/10 overflow-hidden shadow-inner ring-1 ring-white/10 transition-all duration-700 group-hover:rotate-6 group-hover:scale-110">
-              {festival.image ? (
-                <img src={festival.image} alt={festival.name} className="h-full w-full object-cover" />
-              ) : (
-                <span className="text-4xl drop-shadow-lg">{festival.emoji ?? "🎉"}</span>
-              )}
-            </div>
-            <div className="flex flex-col items-end text-right">
-               <div className="text-2xl font-black text-primary leading-none">{toBanglaNum(date.getDate())}</div>
-               <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">{GREGORIAN_MONTHS_BN[date.getMonth()]}</div>
-            </div>
+        <div className="flex items-start gap-4 p-5">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-festive overflow-hidden shadow-inner ring-2 ring-white/50 transition-transform group-hover:scale-105">
+            {festival.image ? (
+              <img src={festival.image} alt={festival.name} className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-3xl drop-shadow-sm">{festival.emoji ?? "🎉"}</span>
+            )}
           </div>
-
-          <div className="space-y-3">
-            <div className="space-y-1">
-               <h3 className="font-display text-2xl font-black text-accent tracking-tighter group-hover:text-primary transition-colors py-1">
-                 {festival.name}
-               </h3>
-               {festival.englishName && (
-                 <div className="text-[10px] font-black text-primary/40 uppercase tracking-[0.2em]">{festival.englishName}</div>
-               )}
+          <div className="flex-1 min-w-0">
+            <div className="font-display text-lg font-bold text-accent group-hover:text-primary transition-colors">{festival.name}</div>
+            {festival.englishName && (
+              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{festival.englishName}</div>
+            )}
+            <p className="mt-2 line-clamp-2 text-sm text-foreground/70 font-medium">{festival.description}</p>
+            
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-[10px]">
+              <span className="rounded-full bg-secondary/50 px-2.5 py-0.5 font-bold text-muted-foreground">
+                {toBanglaNum(date.getDate())} {GREGORIAN_MONTHS_BN[date.getMonth()]}
+              </span>
+              <span className="rounded-full bg-primary/10 px-2.5 py-0.5 font-bold text-primary">
+                {toBanglaNum(bn.day)} {bn.monthName}
+              </span>
+              <span className="rounded-full bg-accent/10 px-2.5 py-0.5 font-bold text-accent">
+                {labelFor(festival.type)}
+              </span>
             </div>
-            <p className="line-clamp-2 text-sm text-muted-foreground font-medium leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">
-              {festival.description}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 pt-2">
-            <Badge className="bg-primary/5 text-primary border-none text-[9px] font-black uppercase tracking-widest px-3 py-1">
-              {toBanglaNum(bn.day)} {bn.monthName}
-            </Badge>
-            <Badge className="bg-accent/5 text-accent border-none text-[9px] font-black uppercase tracking-widest px-3 py-1">
-              {labelFor(festival.type)}
-            </Badge>
           </div>
         </div>
       </Link>
 
-      <div className="px-8 pb-8 pt-0 mt-auto">
+      <div className="px-5 pb-5 pt-0">
         <BengaliWikiDialog 
           query={festival.name}
           title={festival.name}
@@ -71,29 +60,17 @@ export function FestivalCard({
             <Button 
               variant="ghost" 
               size="sm" 
-              className="w-full h-11 justify-center gap-3 text-[11px] font-black uppercase tracking-widest text-primary bg-primary/5 hover:bg-primary hover:text-white rounded-[20px] transition-all duration-300"
+              className="w-full h-9 justify-center gap-2 text-primary font-bold bg-primary/5 hover:bg-primary/10 rounded-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <BookOpen className="h-4 w-4" />
+              <BookOpen className="h-3.5 w-3.5" />
               ইতিহাস জানুন
             </Button>
           }
         />
       </div>
-      
-      {/* Decorative Gradient Overlay */}
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
     </Card>
   );
-}
-
-function labelFor(t: Festival["type"]): string {
-  switch (t) {
-    case "national": return "জাতীয়";
-    case "cultural": return "সাংস্কৃতিক";
-    case "seasonal": return "ঋতুভিত্তিক";
-    case "literary": return "সাহিত্যিক";
-  }
 }
 
 function labelFor(t: Festival["type"]): string {
