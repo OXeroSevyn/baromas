@@ -63,71 +63,64 @@ const Day = () => {
   const [editing, setEditing] = useState<CalendarEvent | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
 
-  const shareImage = async () => {
+  const captureImage = async (isDownload = false) => {
     if (!shareRef.current) return;
     
     setIsCapturing(true);
-    toast.loading("শেয়ার করার জন্য ইমেজ তৈরি হচ্ছে...");
+    toast.loading(isDownload ? "ইমেজ ডাউনলোড হচ্ছে..." : "শেয়ার করার জন্য ইমেজ তৈরি হচ্ছে...");
     
     try {
-      // Small delay to ensure state update for branding footer
-      await new Promise(r => setTimeout(r, 100));
+      // Wait for re-render and fonts
+      await new Promise(r => setTimeout(r, 500));
       
-      const dataUrl = await toPng(shareRef.current, {
+      const options = {
         cacheBust: true,
+        pixelRatio: 2, // High quality
         backgroundColor: "#fdf8f4",
         style: {
           borderRadius: '0',
           padding: '20px'
+        },
+        // Filter out any elements that might cause issues
+        filter: (node: any) => {
+          if (node.classList?.contains('capture-ignore')) return false;
+          return true;
         }
-      });
-      
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], `ponjika-${isoDate(d)}.png`, { type: 'image/png' });
+      };
 
-      if (navigator.share && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: `বারোমাস পঞ্জিকা - ${formatBanglaDate(bn)}`,
-        });
-        toast.dismiss();
-      } else {
-        // Fallback to download if sharing files is not supported
+      const dataUrl = await toPng(shareRef.current, options);
+      
+      if (isDownload) {
         const link = document.createElement('a');
         link.download = `ponjika-${isoDate(d)}.png`;
         link.href = dataUrl;
         link.click();
         toast.dismiss();
-        toast.success("ইমেজ ডাউনলোড হয়েছে (শেয়ারিং সাপোর্ট নেই)");
+        toast.success("ডাউনলোড সম্পন্ন হয়েছে");
+      } else {
+        const res = await fetch(dataUrl);
+        const blob = await res.blob();
+        const file = new File([blob], `ponjika-${isoDate(d)}.png`, { type: 'image/png' });
+
+        if (navigator.share && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: `বারোমাস পঞ্জিকা - ${formatBanglaDate(bn)}`,
+          });
+          toast.dismiss();
+        } else {
+          const link = document.createElement('a');
+          link.download = `ponjika-${isoDate(d)}.png`;
+          link.href = dataUrl;
+          link.click();
+          toast.dismiss();
+          toast.success("ইমেজ ডাউনলোড হয়েছে (শেয়ারিং সাপোর্ট নেই)");
+        }
       }
     } catch (err) {
       console.error(err);
       toast.dismiss();
       toast.error("ইমেজ তৈরি করতে সমস্যা হয়েছে");
-    } finally {
-      setIsCapturing(false);
-    }
-  };
-
-  const downloadImage = async () => {
-    if (!shareRef.current) return;
-    setIsCapturing(true);
-    toast.loading("ইমেজ ডাউনলোড হচ্ছে...");
-    try {
-      await new Promise(r => setTimeout(r, 100));
-      const dataUrl = await toPng(shareRef.current, {
-         cacheBust: true,
-         backgroundColor: "#fdf8f4",
-      });
-      const link = document.createElement('a');
-      link.download = `ponjika-${isoDate(d)}.png`;
-      link.href = dataUrl;
-      link.click();
-      toast.dismiss();
-      toast.success("ডাউনলোড সম্পন্ন হয়েছে");
-    } catch (err) {
-      toast.dismiss();
-      toast.error("ডাউনলোড করতে সমস্যা হয়েছে");
     } finally {
       setIsCapturing(false);
     }
@@ -147,10 +140,10 @@ const Day = () => {
             <Button onClick={() => navigate(`/day/${isoDate(addDays(d, 1))}`)} className="h-10 w-10 p-0 rounded-xl bg-card border-none shadow-soft">
               <ChevronRight className="h-4 w-4" />
             </Button>
-            <Button onClick={downloadImage} className="h-10 px-4 rounded-xl bg-card border-none shadow-soft font-bold text-accent">
+            <Button onClick={() => captureImage(true)} className="h-10 px-4 rounded-xl bg-card border-none shadow-soft font-bold text-accent">
               <Download className="h-4 w-4" /> ডাউনলোড
             </Button>
-            <Button onClick={shareImage} className="h-10 px-4 rounded-xl bg-primary text-white border-none shadow-warm font-bold">
+            <Button onClick={() => captureImage()} className="h-10 px-4 rounded-xl bg-primary text-white border-none shadow-warm font-bold">
               <Share2 className="h-4 w-4" /> শেয়ার ইমেজ
             </Button>
           </div>
