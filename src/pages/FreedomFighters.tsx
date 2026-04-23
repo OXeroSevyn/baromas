@@ -30,6 +30,8 @@ interface WikiData {
 
 const FreedomFightersPage = () => {
   const [q, setQ] = useState("");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   const list = useMemo(() => {
     const t = q.trim().toLowerCase();
     if (!t) return FREEDOM_FIGHTERS;
@@ -74,9 +76,14 @@ const FreedomFightersPage = () => {
           </Badge>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 items-start">
           {list.map((f) => (
-            <FighterCard key={f.id} f={f} />
+            <FighterCard 
+              key={f.id} 
+              f={f} 
+              isExpanded={expandedId === f.id}
+              onToggle={() => setExpandedId(expandedId === f.id ? null : f.id)}
+            />
           ))}
         </div>
 
@@ -90,55 +97,60 @@ const FreedomFightersPage = () => {
   );
 };
 
-function FighterCard({ f }: { f: FreedomFighter }) {
-  const [expanded, setExpanded] = useState(false);
+function FighterCard({ 
+  f, 
+  isExpanded, 
+  onToggle 
+}: { 
+  f: FreedomFighter; 
+  isExpanded: boolean; 
+  onToggle: () => void;
+}) {
   const [wiki, setWiki] = useState<WikiData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const toggleExpand = async () => {
-    const nextState = !expanded;
-    setExpanded(nextState);
-
-    if (nextState && !wiki && !loading) {
-      setLoading(true);
-      setError(null);
-      try {
-        // Try fetching from Bengali Wikipedia
-        const response = await fetch(
-          `https://bn.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(f.name.replace(/\s+/g, "_"))}`
-        );
-        
-        if (!response.ok) {
-           // Fallback to English name if Bengali fails
-           const enResponse = await fetch(
-             `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(f.nameEn.replace(/\s+/g, "_"))}`
-           );
-           if (!enResponse.ok) throw new Error("Data not found");
-           const data = await enResponse.json();
-           setWiki({
-             extract: data.extract,
-             thumbnail: data.thumbnail?.source,
-             originalimage: data.originalimage?.source,
-             desktop_url: data.content_urls.desktop.page
-           });
-        } else {
-          const data = await response.json();
-          setWiki({
-            extract: data.extract,
-            thumbnail: data.thumbnail?.source,
-            originalimage: data.originalimage?.source,
-            desktop_url: data.content_urls.desktop.page
-          });
+  useEffect(() => {
+    if (isExpanded && !wiki && !loading) {
+      const fetchWiki = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const response = await fetch(
+            `https://bn.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(f.name.replace(/\s+/g, "_"))}`
+          );
+          
+          if (!response.ok) {
+             const enResponse = await fetch(
+               `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(f.nameEn.replace(/\s+/g, "_"))}`
+             );
+             if (!enResponse.ok) throw new Error("Data not found");
+             const data = await enResponse.json();
+             setWiki({
+               extract: data.extract,
+               thumbnail: data.thumbnail?.source,
+               originalimage: data.originalimage?.source,
+               desktop_url: data.content_urls.desktop.page
+             });
+          } else {
+            const data = await response.json();
+            setWiki({
+              extract: data.extract,
+              thumbnail: data.thumbnail?.source,
+              originalimage: data.originalimage?.source,
+              desktop_url: data.content_urls.desktop.page
+            });
+          }
+        } catch (err) {
+          console.error("Wiki fetch error:", err);
+          setError("উইকিপিডিয়া থেকে তথ্য পাওয়া যায়নি");
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error("Wiki fetch error:", err);
-        setError("উইকিপিডিয়া থেকে তথ্য পাওয়া যায়নি");
-      } finally {
-        setLoading(false);
-      }
+      };
+      fetchWiki();
     }
-  };
+  }, [isExpanded, wiki, loading, f.name, f.nameEn]);
 
   return (
     <Card className="group relative overflow-hidden p-0 shadow-soft transition-all duration-300 hover:shadow-xl hover:border-primary/30 border-primary/5 bg-white/60 backdrop-blur-md">
@@ -197,20 +209,20 @@ function FighterCard({ f }: { f: FreedomFighter }) {
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={toggleExpand}
+            onClick={onToggle}
             className="w-full h-9 justify-between text-primary font-bold bg-primary/5 hover:bg-primary/10 rounded-xl"
           >
             <div className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
               আরও জানুন (Wikipedia)
             </div>
-            {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </div>
       </div>
 
       <AnimatePresence>
-        {expanded && (
+        {isExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
