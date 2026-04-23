@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { FREEDOM_FIGHTERS, type FreedomFighter } from "@/data/freedom-fighters";
 import { toBanglaNum } from "@/lib/bangla-calendar";
 import { BengaliWikiDialog } from "@/components/calendar/BengaliWikiDialog";
+import { WikiImage } from "@/components/calendar/WikiImage";
 
 const BN_MONTHS = [
   "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
@@ -85,15 +86,26 @@ const FreedomFightersPage = () => {
 };
 
 function FighterCard({ f }: { f: FreedomFighter }) {
+  const [imgError, setImgError] = useState(false);
+
   return (
      <Card className="group relative overflow-hidden p-0 shadow-soft transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:border-primary/30 border-primary/5 bg-card/60 backdrop-blur-xl dark:bg-card/40">
       <div className="p-5">
         <div className="flex gap-4">
           <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-festive overflow-hidden shadow-inner ring-2 ring-white/50">
-            {f.image ? (
-              <img src={f.image} alt={f.name} className="h-full w-full object-cover transition-transform group-hover:scale-110" />
+            {f.image && !imgError ? (
+              <img 
+                src={f.image} 
+                alt={f.name} 
+                className="h-full w-full object-cover transition-transform group-hover:scale-110" 
+                onError={() => setImgError(true)}
+              />
             ) : (
-              <span className="text-3xl text-primary-foreground">{f.emoji ?? "🇮🇳"}</span>
+              <WikiImage 
+                query={f.name} 
+                fallbackEmoji={f.emoji ?? "🇮🇳"} 
+                className="h-full w-full"
+              />
             )}
           </div>
           <div className="min-w-0 flex-1">

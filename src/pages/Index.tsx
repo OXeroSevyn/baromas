@@ -26,14 +26,20 @@ import { BookOpen } from "lucide-react";
 
 // Helper components moved to top for absolute safety
 function QuickLink({ to, label, emoji, image }: { to: string; label: string; emoji: string; image?: string }) {
+  const [imgError, setImgError] = useState(false);
   return (
     <Link
       to={to}
       className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-3 text-center transition-all hover:border-primary hover:bg-primary/5 hover:shadow-soft active:scale-95"
     >
       <div className="flex h-10 w-10 items-center justify-center overflow-hidden">
-        {image ? (
-          <img src={image} alt={label} className="h-full w-full object-contain" />
+        {image && !imgError ? (
+          <img 
+            src={image} 
+            alt={label} 
+            className="h-full w-full object-contain" 
+            onError={() => setImgError(true)}
+          />
         ) : (
           <span className="text-xl">{emoji}</span>
         )}
@@ -44,11 +50,17 @@ function QuickLink({ to, label, emoji, image }: { to: string; label: string; emo
 }
 
 function FeatureCard({ title, desc, icon, image }: { title: string; desc: string; icon: string; image?: string }) {
+  const [imgError, setImgError] = useState(false);
   return (
     <Card className="p-6 text-center shadow-soft hover:shadow-warm transition-all border-b-4 border-b-primary">
       <div className="mb-4 flex h-12 w-full items-center justify-center overflow-hidden">
-        {image ? (
-          <img src={image} alt={title} className="h-full object-contain" />
+        {image && !imgError ? (
+          <img 
+            src={image} 
+            alt={title} 
+            className="h-full object-contain" 
+            onError={() => setImgError(true)}
+          />
         ) : (
           <div className="text-4xl">{icon}</div>
         )}

@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { isoDate, toBanglaNum, GREGORIAN_MONTHS_BN, gregorianToBangla } from "@/lib/bangla-calendar";
 import type { Festival } from "@/data/festivals";
 import type { Region } from "@/lib/bangla-calendar";
 import { BengaliWikiDialog } from "./BengaliWikiDialog";
-import { BookOpen } from "lucide-react";
+import { WikiImage } from "./WikiImage";
+import { BookOpen as BookIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function FestivalCard({
@@ -17,15 +19,26 @@ export function FestivalCard({
   region: Region;
 }) {
   const bn = gregorianToBangla(date, region);
+  const [imgError, setImgError] = useState(false);
+
   return (
     <Card className="group relative h-full overflow-hidden p-0 transition-all hover:-translate-y-1 hover:shadow-warm border-primary/5 bg-white/60 backdrop-blur-md">
       <Link to={`/day/${isoDate(date)}`} className="block">
         <div className="flex items-start gap-4 p-5">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-festive overflow-hidden shadow-inner ring-2 ring-white/50 transition-transform group-hover:scale-105">
-            {festival.image ? (
-              <img src={festival.image} alt={festival.name} className="h-full w-full object-cover" />
+            {festival.image && !imgError ? (
+              <img 
+                src={festival.image} 
+                alt={festival.name} 
+                className="h-full w-full object-cover" 
+                onError={() => setImgError(true)}
+              />
             ) : (
-              <span className="text-3xl drop-shadow-sm">{festival.emoji ?? "🎉"}</span>
+              <WikiImage 
+                query={festival.name} 
+                fallbackEmoji={festival.emoji ?? "🎉"} 
+                className="h-full w-full"
+              />
             )}
           </div>
           <div className="flex-1 min-w-0">
@@ -63,7 +76,7 @@ export function FestivalCard({
               className="w-full h-9 justify-center gap-2 text-primary font-bold bg-primary/5 hover:bg-primary/10 rounded-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <BookOpen className="h-3.5 w-3.5" />
+              <BookIcon className="h-3.5 w-3.5" />
               ইতিহাস জানুন
             </Button>
           }
