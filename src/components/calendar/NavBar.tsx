@@ -42,9 +42,9 @@ export function NavBar() {
               }}
             />
           </div>
-          <div className="hidden sm:flex flex-col">
-            <span className="text-xl font-display font-bold text-accent tracking-tight leading-none group-hover:text-primary transition-colors">বারোমাস</span>
-            <span className="text-[10px] text-primary/70 font-bold uppercase tracking-widest mt-1">তিথি · নক্ষত্র · উৎসব</span>
+          <div className="flex flex-col">
+            <span className="text-lg sm:text-xl font-display font-bold text-accent tracking-tight leading-none group-hover:text-primary transition-colors">বারোমাস</span>
+            <span className="text-[9px] sm:text-[10px] text-primary/70 font-bold uppercase tracking-widest mt-1">তিথি · নক্ষত্র · উৎসব</span>
           </div>
         </Link>
         
