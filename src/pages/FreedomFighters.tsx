@@ -56,12 +56,12 @@ const FreedomFightersPage = () => {
         <div className="mb-4 flex items-center gap-2">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="নাম, ভূমিকা বা আন্দোলন দিয়ে খুঁজুন..."
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              className="pl-9 bg-white/50 backdrop-blur-sm border-primary/10 focus:border-primary/30"
-            />
+             <Input
+               placeholder="নাম, ভূমিকা বা আন্দোলন দিয়ে খুঁজুন..."
+               value={q}
+               onChange={(e) => setQ(e.target.value)}
+               className="pl-9 bg-background/50 dark:bg-card/50 backdrop-blur-sm border-primary/10 focus:border-primary/30"
+             />
           </div>
           <Badge variant="secondary" className="shrink-0 h-10 px-4">
             মোট {toBanglaNum(list.length)} জন
@@ -75,9 +75,9 @@ const FreedomFightersPage = () => {
         </div>
 
         {list.length === 0 && (
-          <Card className="p-12 text-center text-muted-foreground bg-white/40 backdrop-blur-md">
-            কোনো ফলাফল পাওয়া যায়নি
-          </Card>
+           <Card className="p-12 text-center text-muted-foreground bg-background/40 dark:bg-card/40 backdrop-blur-md border-dashed border-primary/10">
+             কোনো ফলাফল পাওয়া যায়নি
+           </Card>
         )}
       </section>
     </PageShell>
@@ -86,7 +86,7 @@ const FreedomFightersPage = () => {
 
 function FighterCard({ f }: { f: FreedomFighter }) {
   return (
-    <Card className="group relative overflow-hidden p-0 shadow-soft transition-all duration-300 hover:shadow-xl hover:border-primary/30 border-primary/5 bg-white/60 backdrop-blur-md">
+     <Card className="group relative overflow-hidden p-0 shadow-soft transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:border-primary/30 border-primary/5 bg-card/60 backdrop-blur-xl dark:bg-card/40">
       <div className="p-5">
         <div className="flex gap-4">
           <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-festive overflow-hidden shadow-inner ring-2 ring-white/50">
@@ -97,9 +97,9 @@ function FighterCard({ f }: { f: FreedomFighter }) {
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-display text-xl font-bold leading-tight text-accent group-hover:text-primary transition-colors py-1">{f.name}</h3>
-            <div className="text-xs text-muted-foreground font-medium uppercase tracking-tight">{f.nameEn}</div>
-            <div className="mt-1 text-sm font-semibold text-primary/80">{f.role}</div>
+             <h3 className="font-display text-xl font-bold leading-tight text-accent dark:text-primary group-hover:text-primary transition-colors py-1">{f.name}</h3>
+             <div className="text-xs text-muted-foreground font-medium uppercase tracking-tight opacity-70">{f.nameEn}</div>
+             <div className="mt-1 text-sm font-semibold text-primary/90 dark:text-primary/70">{f.role}</div>
           </div>
         </div>
 
@@ -110,31 +110,31 @@ function FighterCard({ f }: { f: FreedomFighter }) {
         )}
 
         <div className="mt-4 flex flex-wrap gap-1.5">
-          {f.movements.map((m) => (
-            <Badge key={m} variant="secondary" className="text-[10px] bg-primary/5 text-primary-foreground/70 hover:bg-primary/10 transition-colors">{m}</Badge>
+           {f.movements.map((m) => (
+            <Badge key={m} variant="secondary" className="text-[10px] bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground hover:bg-primary/20 transition-colors border-none">{m}</Badge>
           ))}
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-2 border-t border-primary/10 pt-4 text-xs sm:grid-cols-2">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <div className="p-1 rounded-md bg-primary/5">
-               <CalIcon className="h-3 w-3 text-primary/60" />
-            </div>
-            <span>জন্ম: <span className="text-foreground font-medium">{formatDateBn(f.birth)}</span></span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-             <div className="p-1 rounded-md bg-primary/5">
-                <CalIcon className="h-3 w-3 text-primary/60" />
+           <div className="flex items-center gap-2 text-muted-foreground">
+             <div className="p-1 rounded-md bg-primary/5 dark:bg-primary/10">
+                <CalIcon className="h-3 w-3 text-primary/60 dark:text-primary/40" />
              </div>
-            <span>প্রয়াণ: <span className="text-foreground font-medium">{formatDateBn(f.death)}</span></span>
-          </div>
-          {f.birthPlace && (
-            <div className="flex items-center gap-2 text-muted-foreground sm:col-span-2">
-              <div className="p-1 rounded-md bg-primary/5">
-                <MapPin className="h-3 w-3 text-primary/60" />
+             <span>জন্ম: <span className="text-foreground font-medium">{formatDateBn(f.birth)}</span></span>
+           </div>
+           <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="p-1 rounded-md bg-primary/5 dark:bg-primary/10">
+                 <CalIcon className="h-3 w-3 text-primary/60 dark:text-primary/40" />
               </div>
-              <span className="truncate">{f.birthPlace}</span>
-            </div>
+             <span>প্রয়াণ: <span className="text-foreground font-medium">{formatDateBn(f.death)}</span></span>
+           </div>
+          {f.birthPlace && (
+             <div className="flex items-center gap-2 text-muted-foreground sm:col-span-2">
+               <div className="p-1 rounded-md bg-primary/5 dark:bg-primary/10">
+                 <MapPin className="h-3 w-3 text-primary/60 dark:text-primary/40" />
+               </div>
+               <span className="truncate">{f.birthPlace}</span>
+             </div>
           )}
         </div>
 
