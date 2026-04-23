@@ -46,26 +46,26 @@ const ElectionDay = () => {
   const fetchNews = async () => {
     setLoading(true);
     try {
-      const query = encodeURIComponent("West Bengal Election News");
-      const url = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://news.google.com/rss/search?q=${query}&hl=bn&gl=IN&ceid=IN:bn`)}`;
+      const apiKey = "pub_f3d290147182418085442b9cf26b1ef9";
+      const query = "West Bengal Election";
+      const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&q=${encodeURIComponent(query)}&language=bn&country=in`;
       
       const response = await fetch(url);
       const data = await response.json();
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(data.contents, "text/xml");
-      const items = xmlDoc.querySelectorAll("item");
       
-      const fetchedNews: NewsItem[] = Array.from(items).slice(0, 10).map(item => {
-        const pubDate = new Date(item.querySelector("pubDate")?.textContent || "");
-        const timeStr = pubDate.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
-        return {
-          time: toBanglaNum(timeStr),
-          text: item.querySelector("title")?.textContent || "",
-          link: item.querySelector("link")?.textContent || "#"
-        };
-      });
-
-      setNews(fetchedNews);
+      if (data.status === "success" && data.results) {
+        const fetchedNews: NewsItem[] = data.results.slice(0, 10).map((item: any) => {
+          const pubDate = new Date(item.pubDate || new Date());
+          const timeStr = pubDate.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+          return {
+            time: toBanglaNum(timeStr),
+            text: item.title || "",
+            link: item.link || "#"
+          };
+        });
+        setNews(fetchedNews);
+      }
+      
       setLastUpdate(toBanglaNum(new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' })));
     } catch (error) {
       console.error("Error fetching news:", error);

@@ -34,46 +34,22 @@ const Horoscope = () => {
   const fetchHoroscope = async () => {
     setLoading(true);
     try {
-      const query = encodeURIComponent("আজকের রাশিফল আজকের দিনটি কেমন কাটবে");
-      const timestamp = new Date().getTime();
-      const targetUrl = `https://news.google.com/rss/search?q=${query}&hl=bn&gl=IN&ceid=IN:bn&t=${timestamp}`;
+      const apiKey = "pub_f3d290147182418085442b9cf26b1ef9";
+      const query = "আজকের রাশিফল";
+      const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&q=${encodeURIComponent(query)}&language=bn&country=in`;
       
-      // Using 'raw' instead of 'get' for more reliability
-      const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+      const response = await fetch(url);
+      const data = await response.json();
       
-      let xmlText = "";
-      try {
-        const response = await fetch(url);
-        if (response.ok) {
-          xmlText = await response.text();
-        }
-      } catch (e) {
-        console.warn("Primary proxy failed, trying fallback...");
+      if (data.status === "success" && data.results) {
+        const fetchedNews: HoroscopeItem[] = data.results.slice(0, 15).map((item: any) => ({
+          title: item.title || "",
+          link: item.link || "#",
+          source: item.source_id || "Bengali News",
+          pubDate: item.pubDate || new Date().toISOString()
+        }));
+        setNews(fetchedNews);
       }
-
-      // Fallback proxy if first one fails
-      if (!xmlText) {
-        const fallbackUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
-        const fallbackRes = await fetch(fallbackUrl);
-        if (fallbackRes.ok) {
-          xmlText = await fallbackRes.text();
-        }
-      }
-
-      if (!xmlText) throw new Error("Could not fetch data");
-
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-      const items = xmlDoc.querySelectorAll("item");
-      
-      const fetchedNews: HoroscopeItem[] = Array.from(items).slice(0, 15).map(item => ({
-        title: (item.querySelector("title")?.textContent || "").split(" - ")[0],
-        link: item.querySelector("link")?.textContent || "#",
-        source: item.querySelector("source")?.textContent || "Bengali News",
-        pubDate: item.querySelector("pubDate")?.textContent || ""
-      }));
-
-      setNews(fetchedNews);
     } catch (error) {
       console.error("Error fetching horoscope:", error);
     } finally {

@@ -31,18 +31,21 @@ const Market = () => {
     { name: "এলপিজি (রান্নার গ্যাস)", price: "৯২৯.০০", change: "০.০০", unit: "১৪.২ কেজি সিলিন্ডার", up: true },
   ]);
 
+  const [marketNews, setMarketNews] = useState<any[]>([]);
+
   const fetchMarketRates = async () => {
     setLoading(true);
     try {
-      // Fetching market news snippet to confirm trends
-      const query = encodeURIComponent("Kolkata Gold Petrol Price Today");
-      const url = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://news.google.com/rss/search?q=${query}&hl=bn&gl=IN&ceid=IN:bn`)}`;
+      const apiKey = "pub_f3d290147182418085442b9cf26b1ef9";
+      const query = "Kolkata Market Gold Petrol";
+      const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&q=${encodeURIComponent(query)}&language=bn&country=in`;
       
       const response = await fetch(url);
       const resData = await response.json();
       
-      // We parse the news to show the latest market updates below
-      // The numbers are updated based on the most recent known values for West Bengal
+      if (resData.status === "success" && resData.results) {
+        setMarketNews(resData.results.slice(0, 3));
+      }
       
       setLastUpdate(toBanglaNum(new Date().toLocaleDateString('bn-BD')));
     } catch (error) {
@@ -118,21 +121,15 @@ const Market = () => {
               <TrendingUp className="h-6 w-6 text-primary" /> বাজার সংবাদ ও বিশ্লেষণ
             </h2>
             <div className="space-y-6">
-               <div className="p-4 border rounded-xl hover:bg-secondary/20 cursor-pointer transition-all">
-                  <div className="text-xs font-bold text-primary mb-1">সোনা বাজার</div>
-                  <div className="font-bold text-accent">বিশ্ব বাজারে দাম কমায় কলকাতায় আজ সোনা সস্তা হল।</div>
-                  <div className="text-[10px] text-muted-foreground mt-2">২ ঘণ্টা আগে</div>
-               </div>
-               <div className="p-4 border rounded-xl hover:bg-secondary/20 cursor-pointer transition-all">
-                  <div className="text-xs font-bold text-primary mb-1">জ্বালানি</div>
-                  <div className="font-bold text-accent">টানা কয়েকদিন স্থির পেট্রোল-ডিজেলের দাম, আশাবাদী সাধারণ মানুষ।</div>
-                  <div className="text-[10px] text-muted-foreground mt-2">৫ ঘণ্টা আগে</div>
-               </div>
-               <div className="p-4 border rounded-xl hover:bg-secondary/20 cursor-pointer transition-all">
-                  <div className="text-xs font-bold text-primary mb-1">বাজার ট্রেন্ড</div>
-                  <div className="font-bold text-accent">রুপোর চাহিদা বাড়ায় দাম বাড়ার সম্ভাবনা রয়েছে পরবর্তী সপ্তাহে।</div>
-                  <div className="text-[10px] text-muted-foreground mt-2">১ দিন আগে</div>
-               </div>
+               {marketNews.length > 0 ? marketNews.map((news, idx) => (
+                 <a key={idx} href={news.link} target="_blank" rel="noopener noreferrer" className="block p-4 border rounded-xl hover:bg-secondary/20 cursor-pointer transition-all">
+                    <div className="text-xs font-bold text-primary mb-1">{news.source_id || "Market News"}</div>
+                    <div className="font-bold text-accent line-clamp-2">{news.title}</div>
+                    <div className="text-[10px] text-muted-foreground mt-2">{toBanglaNum(new Date(news.pubDate).toLocaleDateString('bn-BD'))}</div>
+                 </a>
+               )) : (
+                 <p className="text-center py-10 text-muted-foreground">কোনো বাজার সংবাদ পাওয়া যায়নি।</p>
+               )}
             </div>
           </Card>
         </div>
