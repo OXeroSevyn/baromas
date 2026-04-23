@@ -177,6 +177,7 @@ const Index = () => {
                 <QuickLink to="/news" label="সংবাদ" emoji="📰" />
                 <QuickLink to="/weather" label="আবহাওয়া" emoji="☀️" image="/branding/icons/sun.png" />
                 <QuickLink to="/market" label="বাজার দর" emoji="📈" />
+                <QuickLink to="/mantras" label="মন্ত্র" emoji="📜" />
                 <QuickLink to="/festivals" label="উৎসব" emoji="✨" image="/branding/icons/festivals.png" />
                 <QuickLink to="/election-day" label="নির্বাচনী দিন" emoji="🗳️" image="/branding/icons/election.png" />
                 <QuickLink to="/tools" label="টুলস" emoji="🛠️" image="/branding/icons/tools.png" />

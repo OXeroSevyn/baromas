@@ -20,6 +20,7 @@ import Horoscope from "./pages/Horoscope";
 import Weather from "./pages/Weather";
 import Market from "./pages/Market";
 import News from "./pages/News";
+import Mantras from "./pages/Mantras";
 import NotFound from "./pages/NotFound";
 import { LoadingScreen } from "./components/calendar/LoadingScreen";
 import { useState } from "react";
@@ -54,6 +55,7 @@ const App = () => {
           <Route path="/horoscope" element={<Horoscope />} />
           <Route path="/weather" element={<Weather />} />
           <Route path="/market" element={<Market />} />
+          <Route path="/mantras" element={<Mantras />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

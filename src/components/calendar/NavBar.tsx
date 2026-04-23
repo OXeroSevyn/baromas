@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { Calendar, Sparkles, BookOpen, Settings as SettingsIcon, Wrench, ListChecks, Flag, Globe, Moon, Vote, Newspaper, Sun, TrendingUp, Star, MoreHorizontal, ChevronDown } from "lucide-react";
+import { Calendar, Sparkles, BookOpen, Settings as SettingsIcon, Wrench, ListChecks, Flag, Globe, Moon, Vote, Newspaper, Sun, TrendingUp, Star, MoreHorizontal, ChevronDown, ScrollText } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,7 @@ const mainItems = [
 ];
 
 const secondaryItems = [
+  { to: "/mantras", label: "মন্ত্র ও পাঁচালী", icon: ScrollText },
   { to: "/festivals", label: "উৎসব", icon: Sparkles },
   { to: "/election-day", label: "নির্বাচনী দিন", icon: Vote },
   { to: "/freedom-fighters", label: "স্বাধীনতা সংগ্রামী", icon: Flag },
@@ -92,7 +93,7 @@ export function NavBar() {
       </div>
 
       {/* Fixed Bottom Navigation for Mobile */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border bg-background/80 backdrop-blur-lg pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border bg-background/80 backdrop-blur-lg pb-safe no-print">
         <nav className="flex items-center justify-around h-16 px-2">
           {mainItems.slice(0, 5).map((it) => (
             <NavLink
