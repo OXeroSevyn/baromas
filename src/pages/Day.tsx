@@ -354,25 +354,29 @@ const Day = () => {
               </div>
             )}
           </div>
-          </div>
         </div>
 
         {/* Branding Footer for Image Capture */}
         <div className={cn(
-          "mt-8 p-8 flex flex-col items-center justify-center gap-4 bg-white/50 backdrop-blur-sm rounded-[32px] border-2 border-dashed border-primary/20",
+          "mt-12 p-10 flex flex-col items-center justify-center gap-5 bg-white/60 backdrop-blur-md rounded-[40px] border-2 border-dashed border-primary/30 shadow-inner",
           !isCapturing && "hidden"
         )}>
-          <div className="flex items-center gap-3">
-             <div className="h-12 w-12 bg-primary rounded-2xl flex items-center justify-center text-white shadow-warm">
-                <Star className="h-7 w-7 fill-white" />
+          <div className="flex items-center gap-4 scale-110">
+             <div className="h-14 w-14 bg-primary rounded-2xl flex items-center justify-center text-white shadow-warm">
+                <Star className="h-8 w-8 fill-white" />
              </div>
              <div>
-                <div className="font-display text-2xl font-black text-primary tracking-tight">বারোমাস</div>
-                <div className="text-xs font-bold text-accent tracking-[0.2em] uppercase opacity-70">আধুনিক বাংলা পঞ্জিকা</div>
+                <div className="font-display text-3xl font-black text-primary tracking-tighter">বারোমাস</div>
+                <div className="text-[10px] font-bold text-accent tracking-[0.3em] uppercase opacity-60">আধুনিক ডিজিটাল পঞ্জিকা</div>
              </div>
           </div>
-          <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-             <Sparkles className="h-4 w-4 text-primary" /> Downloaded from baromas.app
+          <div className="flex flex-col items-center gap-1">
+            <div className="text-sm font-bold text-muted-foreground flex items-center gap-2">
+               <Sparkles className="h-4 w-4 text-primary animate-pulse" /> আজকের পঞ্জিকা পান baromas.app এ
+            </div>
+            <div className="text-[10px] font-medium text-muted-foreground/50 italic">
+               সম্পূর্ণ নির্ভুল গণনা এবং আধুনিক অভিজ্ঞতার জন্য ডাউনলোড করুন
+            </div>
           </div>
         </div>
       </div>
