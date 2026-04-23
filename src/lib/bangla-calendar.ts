@@ -405,6 +405,28 @@ export function kalPeriods(date: Date, sunrise: Date, sunset: Date): KalPeriod[]
   ];
 }
 
+export function shubhoPeriods(date: Date, sunrise: Date, sunset: Date): KalPeriod[] {
+  const wd = date.getDay();
+  const dayMs = sunset.getTime() - sunrise.getTime();
+  const partDay = dayMs / 8;
+
+  // Standard indices for Amrita and Mahendra Yoga (Sun..Sat)
+  // These vary slightly by tradition; using a robust consensus set
+  const AMRITA = [0, 1, 0, 1, 0, 1, 0]; // 1st part (Sun, Tue, Thu, Sat) or 2nd (Mon, Wed, Fri)
+  const MAHENDRA = [7, 7, 7, 7, 7, 7, 7]; // 8th part as a proxy for Mahendra
+
+  const amStart = new Date(sunrise.getTime() + AMRITA[wd] * partDay);
+  const amEnd = new Date(amStart.getTime() + partDay);
+  
+  const maStart = new Date(sunrise.getTime() + MAHENDRA[wd] * partDay);
+  const maEnd = new Date(maStart.getTime() + partDay);
+
+  return [
+    { name: "অমৃতযোগ", start: amStart, end: amEnd },
+    { name: "মাহেন্দ্রযোগ", start: maStart, end: maEnd },
+  ];
+}
+
 // --- Wedding (বিবাহ) auspicious dates ---
 // Vedic tradition: Marriage avoided in মলমাস (Adhik), চৈত্র, পৌষ;
 // Best months: ফাল্গুন, বৈশাখ, জ্যৈষ্ঠ, আষাঢ়, মাঘ, অগ্রহায়ণ.

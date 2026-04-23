@@ -8,12 +8,13 @@ import {
   formatTimeBangla,
   GREGORIAN_MONTHS_BN,
   kalPeriods,
+  shubhoPeriods,
   sunTimes,
   toBanglaNum,
   type Region,
   type CityName,
 } from "@/lib/bangla-calendar";
-import { AlertTriangle, Heart, Moon } from "lucide-react";
+import { AlertTriangle, Heart, Moon, Sparkles } from "lucide-react";
 
 export function PanjikaCard({ region, city }: { region: Region; city: CityName }) {
   const today = new Date();
@@ -29,6 +30,7 @@ export function PanjikaCard({ region, city }: { region: Region; city: CityName }
   const { sunrise, sunset } = sunTimes(today, c.lat, c.lon);
   const tz = c.timezone || 330;
   const periods = kalPeriods(today, sunrise, sunset);
+  const shubho = shubhoPeriods(today, sunrise, sunset);
   const kalbela = periods.find((p) => p.name === "কালবেলা");
   const rahu = periods.find((p) => p.name === "রাহু কাল");
 
@@ -56,6 +58,23 @@ export function PanjikaCard({ region, city }: { region: Region; city: CityName }
       </div>
 
       <div className="space-y-4 p-4">
+        {/* Today's Auspicious Times */}
+        <div>
+          <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-green-600">
+            <Sparkles className="h-3.5 w-3.5" /> আজকের শুভ সময়
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {shubho.map((s, i) => (
+              <div key={i} className="rounded-md border border-green-200 bg-green-50 p-2">
+                <div className="text-[10px] text-green-700 font-bold uppercase">{s.name}</div>
+                <div className="text-sm font-bold text-green-800">
+                  {formatTimeBangla(s.start, tz)} – {formatTimeBangla(s.end, tz)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Today's Kalbela */}
         <div>
           <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-destructive">
