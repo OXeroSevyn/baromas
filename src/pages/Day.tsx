@@ -120,26 +120,26 @@ const Day = () => {
 
               <div className="p-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                  <DetailStat label="তিথি" value={tithi.name} sub={tithi.paksha} icon={<Moon className="h-4 w-4" />} />
-                  <DetailStat label="নক্ষত্র" value={nakshatra} icon={<Sparkles className="h-4 w-4" />} />
-                  <DetailStat label="সূর্যোদয়" value={formatTimeBangla(sunrise, tz)} sub={c.label} icon={<Sunrise className="h-4 w-4" />} />
-                  <DetailStat label="সূর্যাস্ত" value={formatTimeBangla(sunset, tz)} sub={c.label} icon={<Sunset className="h-4 w-4" />} />
+                  <DetailStat label="তিথি" value={tithi.name} sub={tithi.paksha} icon={<Moon className="h-5 w-5" />} />
+                  <DetailStat label="নক্ষত্র" value={nakshatra} icon={<Sparkles className="h-5 w-5" />} />
+                  <DetailStat label="সূর্যোদয়" value={formatTimeBangla(sunrise, tz)} sub={c.label} icon={<Sunrise className="h-5 w-5" />} />
+                  <DetailStat label="সূর্যাস্ত" value={formatTimeBangla(sunset, tz)} sub={c.label} icon={<Sunset className="h-5 w-5" />} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                   <Card className="p-5 border-none bg-secondary/30 rounded-3xl">
-                      <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                         <Clock className="h-3.5 w-3.5" /> দিনমান
+                   <Card className="p-6 border-none bg-secondary/30 rounded-3xl">
+                      <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground uppercase tracking-wider mb-2">
+                         <Clock className="h-4 w-4" /> দিনমান
                       </div>
-                      <div className="text-lg font-bold text-accent">
+                      <div className="text-xl font-bold text-accent">
                          {formatDuration(dayLengthMinutes(sunrise, sunset))}
                       </div>
                    </Card>
-                   <Card className="p-5 border-none bg-primary/5 rounded-3xl">
-                      <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider mb-2">
-                         <Sparkles className="h-3.5 w-3.5" /> শুভ মুহূর্ত (ব্রাহ্ম)
+                   <Card className="p-6 border-none bg-primary/5 rounded-3xl">
+                      <div className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-wider mb-2">
+                         <Sparkles className="h-4 w-4" /> শুভ মুহূর্ত (ব্রাহ্ম)
                       </div>
-                      <div className="text-lg font-bold text-primary">
+                      <div className="text-xl font-bold text-primary">
                          {formatTimeBangla(aus.start, tz)} – {formatTimeBangla(aus.end, tz)}
                       </div>
                    </Card>
@@ -150,14 +150,14 @@ const Day = () => {
             {/* Shubho / Osubho Details */}
             <div className="grid md:grid-cols-2 gap-6">
                <Card className="p-6 border-none shadow-soft rounded-[32px] bg-white">
-                  <h3 className="flex items-center gap-2 text-green-600 font-bold mb-5 uppercase tracking-tight">
+                  <h3 className="flex items-center gap-2 text-green-600 font-bold mb-5 text-lg uppercase tracking-tight">
                     <Sparkles className="h-5 w-5" /> আজকের শুভ সময়
                   </h3>
                   <div className="space-y-3">
                      {shubhoTimes.map((s, i) => (
                        <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-green-50 border border-green-100">
-                          <span className="font-bold text-green-800 text-sm">{s.name}</span>
-                          <span className="font-display font-semibold text-green-700">
+                          <span className="font-bold text-green-800 text-base">{s.name}</span>
+                          <span className="font-display font-semibold text-green-700 text-lg">
                              {formatTimeBangla(s.start, tz)} – {formatTimeBangla(s.end, tz)}
                           </span>
                        </div>
@@ -166,14 +166,14 @@ const Day = () => {
                </Card>
 
                <Card className="p-6 border-none shadow-soft rounded-[32px] bg-white">
-                  <h3 className="flex items-center gap-2 text-destructive font-bold mb-5 uppercase tracking-tight">
+                  <h3 className="flex items-center gap-2 text-destructive font-bold mb-5 text-lg uppercase tracking-tight">
                     <AlertTriangle className="h-5 w-5" /> আজকের অশুভ সময়
                   </h3>
                   <div className="space-y-3">
                      {inauspiciousTimes.filter(p => ["কালবেলা", "রাহু কাল", "যমগণ্ড"].includes(p.name)).map((s, i) => (
                        <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-destructive/5 border border-destructive/10">
-                          <span className="font-bold text-destructive text-sm">{s.name}</span>
-                          <span className="font-display font-semibold text-destructive/80">
+                          <span className="font-bold text-destructive text-base">{s.name}</span>
+                          <span className="font-display font-semibold text-destructive/80 text-lg">
                              {formatTimeBangla(s.start, tz)} – {formatTimeBangla(s.end, tz)}
                           </span>
                        </div>
@@ -183,22 +183,22 @@ const Day = () => {
             </div>
 
             {/* Lagna Table */}
-            <Card className="p-6 border-none shadow-soft rounded-[32px] bg-white">
-               <h3 className="flex items-center gap-2 text-accent font-bold mb-6 uppercase tracking-tight">
-                 <Star className="h-5 w-5 text-orange-400 fill-orange-400" /> আজকের লগ্ন তালিকা
+            <Card className="p-8 border-none shadow-soft rounded-[32px] bg-white">
+               <h3 className="flex items-center gap-2 text-accent font-bold mb-6 text-lg uppercase tracking-tight">
+                 <Star className="h-6 w-6 text-orange-400 fill-orange-400" /> আজকের লগ্ন তালিকা
                </h3>
-               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {LAGNAS.map((l, i) => {
                     const lStart = new Date(sunrise.getTime() + i * 120 * 60000);
                     const isCurrent = currentLagna.name === l;
                     return (
                       <div key={i} className={cn(
-                        "p-3 rounded-2xl text-center transition-all",
-                        isCurrent ? "bg-primary text-white shadow-lg scale-105" : "bg-secondary/20 text-muted-foreground"
+                        "p-4 rounded-2xl text-center transition-all border",
+                        isCurrent ? "bg-primary text-white shadow-lg scale-105 border-primary" : "bg-secondary/10 text-muted-foreground border-transparent"
                       )}>
-                        <div className="text-[10px] uppercase font-bold opacity-70 mb-1">লগ্ন</div>
-                        <div className="font-bold text-sm">{l}</div>
-                        <div className="text-[9px] mt-1 opacity-80">{formatTimeBangla(lStart, tz)}</div>
+                        <div className="text-xs uppercase font-bold opacity-70 mb-1">লগ্ন</div>
+                        <div className="font-bold text-base">{l}</div>
+                        <div className="text-[11px] mt-1 font-medium opacity-90">{formatTimeBangla(lStart, tz)}</div>
                       </div>
                     );
                   })}
@@ -290,12 +290,12 @@ const Day = () => {
 
 function DetailStat({ label, value, sub, icon }: { label: string; value: string; sub?: string; icon: React.ReactNode }) {
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-[0.1em]">
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground uppercase tracking-[0.1em]">
         {icon} {label}
       </div>
-      <div className="font-display text-xl font-bold text-accent">{value}</div>
-      {sub && <div className="text-xs font-medium text-primary/70">{sub}</div>}
+      <div className="font-display text-2xl font-bold text-accent">{value}</div>
+      {sub && <div className="text-base font-medium text-primary/70">{sub}</div>}
     </div>
   );
 }
