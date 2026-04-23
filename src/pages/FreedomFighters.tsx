@@ -114,30 +114,29 @@ function FighterCard({ f }: { f: FreedomFighter }) {
             `https://bn.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(f.name.replace(/\s+/g, "_"))}`
           );
           
-          if (!response.ok) {
-             const enResponse = await fetch(
-               `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(f.nameEn.replace(/\s+/g, "_"))}`
-             );
-             if (!enResponse.ok) throw new Error("Data not found");
-             const data = await enResponse.json();
-             setWiki({
-               extract: data.extract,
-               thumbnail: data.thumbnail?.source,
-               originalimage: data.originalimage?.source,
-               desktop_url: data.content_urls.desktop.page
-             });
-          } else {
+          if (response.ok) {
             const data = await response.json();
-            setWiki({
-              extract: data.extract,
-              thumbnail: data.thumbnail?.source,
-              originalimage: data.originalimage?.source,
-              desktop_url: data.content_urls.desktop.page
-            });
+            // Heuristic to check for Bengali characters to avoid accidental English content
+            const hasBengali = /[\u0980-\u09FF]/.test(data.extract);
+            
+            if (hasBengali) {
+              setWiki({
+                extract: data.extract,
+                thumbnail: data.thumbnail?.source,
+                originalimage: data.originalimage?.source,
+                desktop_url: data.content_urls.desktop.page
+              });
+            } else {
+              // If wiki content is English, don't set it, so it falls back to local f.description
+              setWiki(null);
+            }
+          } else {
+            // No Bengali page found
+            setWiki(null);
           }
         } catch (err) {
           console.error("Wiki fetch error:", err);
-          setError("উইকিপিডিয়া থেকে তথ্য পাওয়া যায়নি");
+          setError("তথ্য সংগ্রহে সমস্যা হচ্ছে");
         } finally {
           setLoading(false);
         }
