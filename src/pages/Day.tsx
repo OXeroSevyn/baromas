@@ -34,7 +34,6 @@ import { EventDialog } from "@/components/calendar/EventDialog";
 import { toast } from "sonner";
 import { AlertTriangle, Sparkles, Star, Clock, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { toPng } from "html-to-image";
 import { useRef } from "react";
 
 const Day = () => {
@@ -72,6 +71,8 @@ const Day = () => {
     try {
       // Wait for re-render and fonts
       await new Promise(r => setTimeout(r, 500));
+      
+      const { toPng } = await import("html-to-image");
       
       const options = {
         cacheBust: true,
