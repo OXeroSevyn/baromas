@@ -7,11 +7,18 @@ import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { toBanglaNum } from "@/lib/bangla-calendar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Mantras = () => {
   const [query, setQuery] = useState("");
   const [filterType, setFilterType] = useState<"all" | "mantra" | "panchali">("all");
   const [selectedMantra, setSelectedMantra] = useState<MantraItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filtered = useMemo(() => {
     return MANTRAS.filter(m => {
@@ -20,6 +27,11 @@ const Mantras = () => {
       return matchQuery && matchType;
     });
   }, [query, filterType]);
+
+  const handleOpenMantra = (mantra: MantraItem) => {
+    setSelectedMantra(mantra);
+    setIsModalOpen(true);
+  };
 
   const handleDownload = (mantra: MantraItem) => {
     setSelectedMantra(mantra);
@@ -76,7 +88,11 @@ const Mantras = () => {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((m) => (
-            <Card key={m.id} className="group overflow-hidden rounded-[32px] border-none shadow-soft hover:shadow-warm transition-all p-6 flex flex-col justify-between bg-white/80 backdrop-blur-sm">
+            <Card 
+              key={m.id} 
+              onClick={() => handleOpenMantra(m)}
+              className="group cursor-pointer overflow-hidden rounded-[32px] border-none shadow-soft hover:shadow-warm hover:scale-[1.02] active:scale-[0.98] transition-all p-6 flex flex-col justify-between bg-white/80 backdrop-blur-sm"
+            >
               <div>
                 <div className="flex justify-between items-start mb-4">
                   <div className="p-3 bg-primary/5 rounded-2xl group-hover:bg-primary group-hover:text-white transition-all">
@@ -95,20 +111,70 @@ const Mantras = () => {
                    <Star className="h-3 w-3 text-orange-400 fill-orange-400" /> {m.god}
                 </span>
                 <button 
-                  onClick={() => handleDownload(m)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDownload(m);
+                  }}
                   className="flex items-center gap-2 text-primary hover:underline text-xs font-bold"
                 >
                   <Download className="h-4 w-4" /> ডাউনলোড PDF
                 </button>
               </div>
-
-              {/* Mantra Content Preview (Only visible in full mode but we keep it here for logic) */}
-              <div className="hidden">
-                 {/* This hidden part could be a Modal trigger but for PDF we use the specialized Print element below */}
-              </div>
             </Card>
           ))}
         </div>
+
+        {/* Full View Modal */}
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="max-w-2xl rounded-[40px] border-none shadow-2xl p-0 overflow-hidden bg-white">
+            {selectedMantra && (
+              <div className="flex flex-col h-[80vh] md:h-auto max-h-[90vh]">
+                <div className="h-32 bg-gradient-to-br from-primary to-orange-600 flex items-end px-8 pb-6 shrink-0">
+                  <div className="flex items-center justify-between w-full">
+                    <div>
+                       <Badge className="bg-white/20 text-white border-none mb-2 uppercase text-[10px] font-bold">
+                          {selectedMantra.type === "mantra" ? "প্রণাম মন্ত্র" : "ব্রতকথা ও পাঁচালী"}
+                       </Badge>
+                       <DialogTitle className="text-2xl md:text-3xl font-bold text-white">{selectedMantra.name}</DialogTitle>
+                    </div>
+                    <div className="hidden md:block p-4 bg-white/10 rounded-2xl backdrop-blur-md">
+                       <ScrollText className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
+                  <div className="flex items-center gap-2 text-xs font-bold text-primary mb-6">
+                     <Star className="h-4 w-4 text-orange-400 fill-orange-400" /> {selectedMantra.god}
+                  </div>
+                  
+                  <div className="text-xl md:text-2xl leading-relaxed whitespace-pre-wrap font-serif text-accent text-center mb-10">
+                    {selectedMantra.content}
+                  </div>
+
+                  {selectedMantra.description && (
+                    <div className="p-6 bg-secondary/30 rounded-3xl border-l-4 border-primary">
+                      <h4 className="font-bold text-accent mb-2">মাহাত্ম্য ও নিয়ম:</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {selectedMantra.description}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-6 border-t border-secondary bg-secondary/10 flex items-center justify-between shrink-0">
+                   <p className="text-[10px] text-muted-foreground italic">সূত্র: ঐতিহ্যবাহী পুথি ও পাঁচালী</p>
+                   <button 
+                    onClick={() => handleDownload(selectedMantra)}
+                    className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
+                   >
+                     <Download className="h-4 w-4" /> PDF ডাউনলোড করুন
+                   </button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {filtered.length === 0 && (
           <div className="text-center py-20 bg-card/30 border-2 border-dashed rounded-[40px]">
