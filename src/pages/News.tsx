@@ -203,7 +203,7 @@ const News = () => {
                 key={item.id}
                 onClick={() => toggleExpand(item.id)}
                 className={cn(
-                  "relative overflow-hidden rounded-[48px] border border-primary/5 bg-card/40 backdrop-blur-xl transition-all duration-700 cursor-pointer hover:shadow-3xl hover:shadow-primary/5 group",
+                  "relative overflow-hidden rounded-[48px] border border-border bg-card/40 backdrop-blur-xl transition-all duration-700 cursor-pointer hover:shadow-3xl hover:shadow-primary/5 group",
                   expandedId === item.id ? "ring-2 ring-primary/20 bg-card" : ""
                 )}
               >

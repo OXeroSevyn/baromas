@@ -33,7 +33,7 @@ export function TodayCard({ region, city }: { region: Region; city: CityName }) 
   const aus = auspiciousWindow(sunrise);
 
   return (
-    <Card className="overflow-hidden border-2 border-primary/20 shadow-warm">
+    <Card className="overflow-hidden border border-primary/20 shadow-warm">
       <div className="bg-gradient-festive p-5 text-primary-foreground">
         <div className="flex items-center justify-between gap-3">
           <div>

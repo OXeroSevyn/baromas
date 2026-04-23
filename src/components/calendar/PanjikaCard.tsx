@@ -43,7 +43,7 @@ export function PanjikaCard({ region, city }: { region: Region; city: CityName }
   };
 
   return (
-    <Card className="overflow-hidden border-2 border-primary/20 p-0 shadow-soft">
+    <Card className="overflow-hidden border border-primary/20 p-0 shadow-soft">
       <div className="bg-gradient-festive px-4 py-3 text-primary-foreground">
         <div className="flex items-center justify-between">
           <div className="font-display text-lg font-bold">পঞ্জিকা</div>

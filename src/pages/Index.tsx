@@ -148,7 +148,7 @@ const Index = () => {
             <PanjikaCard region={region} city={city} />
 
             {recipe && (
-              <Card className="overflow-hidden border-2 border-festive/10 p-5 shadow-soft bg-gradient-to-br from-background to-festive/5 group relative">
+              <Card className="overflow-hidden border border-festive/10 p-5 shadow-soft bg-gradient-to-br from-background to-festive/5 group relative">
                 <div className="flex items-center justify-between mb-2">
                   <div className="text-xs font-semibold uppercase tracking-wide text-festive">
                     ঋতুর রন্ধন

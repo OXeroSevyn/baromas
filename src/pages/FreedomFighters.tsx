@@ -43,7 +43,7 @@ const FreedomFightersPage = () => {
           <Link to="/" className="text-sm text-muted-foreground hover:text-primary">← মূল পাতা</Link>
         </div>
 
-        <Card className="mb-6 overflow-hidden border-2 border-primary/20 shadow-warm">
+        <Card className="mb-6 overflow-hidden border border-primary/20 shadow-warm">
           <div className="bg-gradient-festive p-6 text-primary-foreground">
             <div className="text-xs uppercase tracking-wider opacity-90">ভারতের স্বাধীনতা সংগ্রাম</div>
             <h1 className="mt-1 font-display text-3xl font-bold md:text-4xl py-1">স্বাধীনতা সংগ্রামী</h1>

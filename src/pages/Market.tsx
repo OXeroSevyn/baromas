@@ -98,7 +98,7 @@ const Market = () => {
           {data.map((item, i) => (
             <Card 
               key={i} 
-              className="relative overflow-hidden rounded-[48px] border border-primary/5 bg-card/40 backdrop-blur-xl p-10 transition-all duration-700 hover:-translate-y-2 hover:shadow-3xl hover:shadow-primary/5 group"
+              className="relative overflow-hidden rounded-[48px] border border-border bg-card/40 backdrop-blur-xl p-10 transition-all duration-700 hover:-translate-y-2 hover:shadow-3xl hover:shadow-primary/5 group"
             >
               <div className="absolute top-0 right-0 p-10 opacity-[0.03] group-hover:scale-110 transition-transform duration-1000 pointer-events-none">
                  <TrendUpIcon className="h-40 w-40" />

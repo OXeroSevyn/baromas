@@ -136,7 +136,7 @@ function TithiList({
               {list.map((it, i) => (
                 <Card
                   key={i}
-                  className={`border-2 p-4 shadow-soft ${colors[it.type]}`}
+                  className={`border p-4 shadow-soft ${colors[it.type]}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -185,7 +185,7 @@ function WeddingList({
         {items.map((w, i) => (
           <Card
             key={i}
-            className="border-2 border-festive/30 bg-festive/5 p-4 shadow-soft"
+            className="border border-festive/30 bg-festive/5 p-4 shadow-soft"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1">
@@ -251,7 +251,7 @@ function KalView({
 }) {
   return (
     <div className="space-y-4">
-      <Card className="border-2 border-accent/30 p-4 shadow-soft">
+      <Card className="border border-accent/30 p-4 shadow-soft">
         <div className="flex items-center gap-2 text-sm">
           <Sun className="h-4 w-4 text-gold" />
           <span className="text-muted-foreground">{cityLabel} —</span>
@@ -264,7 +264,7 @@ function KalView({
         {periods.map((p, i) => (
           <Card
             key={i}
-            className="border-2 border-destructive/20 bg-destructive/5 p-4 shadow-soft"
+            className="border border-destructive/20 bg-destructive/5 p-4 shadow-soft"
           >
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-destructive" />
@@ -282,7 +282,7 @@ function KalView({
           </Card>
         ))}
       </div>
-      <Card className="border-2 border-primary/30 bg-primary/5 p-4 shadow-soft">
+      <Card className="border border-primary/30 bg-primary/5 p-4 shadow-soft">
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
           <div className="font-display font-bold text-primary">

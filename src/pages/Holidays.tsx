@@ -100,7 +100,7 @@ const HolidaysPage = () => {
           <Link to="/" className="text-sm text-muted-foreground hover:text-primary">← মূল পাতা</Link>
         </div>
 
-        <Card className="mb-4 overflow-hidden border-2 border-primary/20 shadow-warm">
+        <Card className="mb-4 overflow-hidden border border-primary/20 shadow-warm">
           <div className="bg-gradient-festive p-5 text-primary-foreground">
             <div className="text-xs uppercase tracking-wider opacity-90">বিশ্বজুড়ে</div>
             <h1 className="mt-1 flex items-center gap-2 font-display text-2xl font-bold md:text-3xl">

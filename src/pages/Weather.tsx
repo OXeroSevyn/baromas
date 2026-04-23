@@ -300,7 +300,7 @@ const Weather = () => {
             </div>
           </div>
         ) : (
-          <div className="text-center py-24 bg-card/40 border-2 border-dashed border-primary/10 rounded-[48px] backdrop-blur-sm">
+          <div className="text-center py-24 bg-card/40 border border-dashed border-primary/10 rounded-[48px] backdrop-blur-sm">
              <CloudRain className="h-20 w-20 text-primary mx-auto mb-6 opacity-20" />
              <h3 className="text-accent font-black text-2xl mb-2">আবহাওয়া তথ্য পাওয়া যাচ্ছে না</h3>
              <p className="text-muted-foreground font-medium mb-8">দয়া করে আপনার ইন্টারনেট সংযোগ চেক করুন।</p>
