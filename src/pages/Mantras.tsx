@@ -37,10 +37,14 @@ const Mantras = () => {
   };
 
   const handleDownload = (mantra: MantraItem) => {
+    const originalTitle = document.title;
+    document.title = `${mantra.name} - বারোমাস`;
     setSelectedMantra(mantra);
+    
     // Give state time to update the print hidden element
     setTimeout(() => {
       window.print();
+      document.title = originalTitle;
     }, 100);
   };
 
