@@ -14,6 +14,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { createPortal } from "react-dom";
+
 const Mantras = () => {
   const [query, setQuery] = useState("");
   const [filterType, setFilterType] = useState<"all" | "mantra" | "panchali">("all");
@@ -22,7 +24,8 @@ const Mantras = () => {
 
   const filtered = useMemo(() => {
     return MANTRAS.filter(m => {
-      const matchQuery = m.name.includes(query) || m.god.includes(query);
+      const matchQuery = m.name.toLowerCase().includes(query.toLowerCase()) || 
+                         m.god.toLowerCase().includes(query.toLowerCase());
       const matchType = filterType === "all" || m.type === filterType;
       return matchQuery && matchType;
     });
@@ -126,7 +129,7 @@ const Mantras = () => {
 
         {/* Full View Modal */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="max-w-2xl rounded-[40px] border-none shadow-2xl p-0 overflow-hidden bg-white">
+          <DialogContent className="max-w-2xl rounded-[40px] border-none shadow-2xl p-0 overflow-hidden bg-white print:hidden">
             {selectedMantra && (
               <div className="flex flex-col h-[80vh] md:h-auto max-h-[90vh]">
                 <div className="h-32 bg-gradient-to-br from-primary to-orange-600 flex items-end px-8 pb-6 shrink-0">
@@ -185,57 +188,58 @@ const Mantras = () => {
              <p className="text-muted-foreground font-bold text-xl">এই বিভাগে কোনো তথ্য পাওয়া যায়নি।</p>
           </div>
         )}
-
-        {/* Specialized Print Template (Very Simple & Clean) */}
-        {selectedMantra && (
-          <div id="print-mantra" className="hidden print:block bg-white text-black">
-             <div className="p-10 max-w-3xl mx-auto">
-                {/* Minimal Header */}
-                <div className="flex justify-between items-center mb-12 border-b-2 border-black/10 pb-6">
-                   <div className="flex items-center gap-3">
-                      <img src="/branding/logo-color.png" alt="Logo" className="h-10 w-10" />
-                      <div>
-                        <h1 className="text-xl font-bold text-black">বারোমাস</h1>
-                        <p className="text-[8px] uppercase tracking-wider text-muted-foreground">Devotional Collection</p>
-                      </div>
-                   </div>
-                   <div className="text-right">
-                      <div className="text-sm font-bold">{toBanglaNum(new Date().toLocaleDateString('bn-BD'))}</div>
-                      <div className="text-[8px] text-muted-foreground">© baromas.app</div>
-                   </div>
-                </div>
-
-                {/* Content Section */}
-                <div className="mb-10 text-center">
-                   <h2 className="text-3xl font-bold mb-4">{selectedMantra.name}</h2>
-                   <p className="text-xs text-muted-foreground font-bold italic">{selectedMantra.god} প্রণাম / পূজা</p>
-                </div>
-
-                <div className={cn(
-                  "text-xl leading-[1.8] whitespace-pre-wrap font-serif text-black/90",
-                  selectedMantra.type === "panchali" ? "text-left" : "text-center"
-                )}>
-                  {selectedMantra.content}
-                </div>
-
-                {selectedMantra.description && (
-                  <div className="mt-12 pt-8 border-t border-black/5 italic text-sm text-muted-foreground">
-                    <h4 className="font-bold text-black not-italic mb-2">মাহাত্ম্য ও নিয়ম:</h4>
-                    {selectedMantra.description}
-                  </div>
-                )}
-
-                {/* Simple Footer */}
-                <div className="mt-20 text-center border-t border-black/10 pt-6">
-                   <p className="text-[10px] text-muted-foreground">
-                     "বাংলার সময়, সংস্কৃতি আর উৎসবের ডিজিটাল ঠিকানা"
-                   </p>
-                   <p className="text-[9px] font-bold mt-1">www.baromas.app</p>
-                </div>
-             </div>
-          </div>
-        )}
       </div>
+
+      {/* Specialized Print Template rendered via Portal to escape parent layout and Dialog */}
+      {selectedMantra && createPortal(
+        <div id="print-mantra" className="hidden print:block bg-white text-black">
+           <div className="p-10 max-w-3xl mx-auto">
+              {/* Minimal Header */}
+              <div className="flex justify-between items-center mb-12 border-b-2 border-black/10 pb-6">
+                 <div className="flex items-center gap-3">
+                    <img src="/branding/logo-color.png" alt="Logo" className="h-10 w-10" />
+                    <div>
+                      <h1 className="text-xl font-bold text-black">বারোমাস</h1>
+                      <p className="text-[8px] uppercase tracking-wider text-muted-foreground">Devotional Collection</p>
+                    </div>
+                 </div>
+                 <div className="text-right">
+                    <div className="text-sm font-bold">{toBanglaNum(new Date().toLocaleDateString('bn-BD'))}</div>
+                    <div className="text-[8px] text-muted-foreground">© baromas.app</div>
+                 </div>
+              </div>
+
+              {/* Content Section */}
+              <div className="mb-10 text-center">
+                 <h2 className="text-3xl font-bold mb-4">{selectedMantra.name}</h2>
+                 <p className="text-xs text-muted-foreground font-bold italic">{selectedMantra.god} প্রণাম / পূজা</p>
+              </div>
+
+              <div className={cn(
+                "text-xl leading-[1.8] whitespace-pre-wrap font-serif text-black/90",
+                selectedMantra.type === "panchali" ? "text-left" : "text-center"
+              )}>
+                {selectedMantra.content}
+              </div>
+
+              {selectedMantra.description && (
+                <div className="mt-12 pt-8 border-t border-black/5 italic text-sm text-muted-foreground">
+                  <h4 className="font-bold text-black not-italic mb-2">মাহাত্ম্য ও নিয়ম:</h4>
+                  {selectedMantra.description}
+                </div>
+              )}
+
+              {/* Simple Footer */}
+              <div className="mt-20 text-center border-t border-black/10 pt-6">
+                 <p className="text-[10px] text-muted-foreground">
+                   "বাংলার সময়, সংস্কৃতি আর উৎসবের ডিজিটাল ঠিকানা"
+                 </p>
+                 <p className="text-[9px] font-bold mt-1">www.baromas.app</p>
+              </div>
+           </div>
+        </div>,
+        document.body
+      )}
     </PageShell>
   );
 };
